@@ -400,7 +400,10 @@ rm("aux_table")
 ## Merge both 'digitised' and 'ebird' datasets, & save it ####
 
 all_data_long <- 
+  # Merge both datasets
   dplyr::bind_rows(all_data_long, ebird_data) %>% 
+  ## -- Last few bits of wrangling --
+  # Remove time and notes columns
   dplyr::select(-c(time, notes)) %>% 
   # Add year and month columns
   dplyr::mutate(year = as.numeric(stringr::str_sub(date, start = 1, end = -7)),
@@ -412,8 +415,9 @@ all_data_long <-
     month > 06 & month <= 09 ~ "winter",
     month > 09 ~ "spring",
   )) %>% 
-  # Replace NA values with 0
-  dplyr::mutate(count = tidyr::replace_na(as.numeric(count), 0))
+  # Replace NA values with 0, and filter them away
+  dplyr::mutate(count = tidyr::replace_na(as.numeric(count), 0)) %>% 
+  dplyr::filter(! count == 0)
 
 write.csv(all_data_long,
           file = "./data-processed/all_data_long.csv")
