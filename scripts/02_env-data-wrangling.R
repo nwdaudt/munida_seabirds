@@ -4,7 +4,8 @@
 ## -------------------------------------------------------------------------- ##
 ## -------------------------------------------------------------------------- ##
 
-## This script wrangles the Temperature-Salinity and the Wind Stress data.
+## This script wrangles the Temperature-Salinity and the Wind Stress data,
+## and merges them with 'seabird_data_long'.
 
 ## See main text for full explanation, but briefly:
 
@@ -23,15 +24,15 @@
 ## Libraries ####
 
 library(readxl)
-# library(plyr)
 library(dplyr)
-# library(tidyr)
-# library(janitor)
+library(janitor)
 
 ## Get Munida transect dates ####
 
+seabird_data <- read.csv("./data-processed/seabird_data_long.csv")
+
 munida_dates <- 
-  read.csv("./data-processed/all_data_long.csv") %>% 
+  seabird_data %>% 
   dplyr::distinct(date) %>% 
   dplyr::pull() %>% 
   as.Date(date, format = "%Y-%m-%d")
@@ -102,7 +103,7 @@ ts_data_summarised <-
   ), .keep = "unused", .after = "date") %>% 
   dplyr::ungroup(.)
 
-## Create an auxiliary table to help 
+## Loop through the conditions to classify water masses
 
 # Neritic Water (NW)
 # Subtropical Water (STW)
@@ -183,7 +184,7 @@ rm("seasons",
 ## Windstress data ####
 
 windstress_data <- read.csv("./data-raw/ts-and-windstress/along_shelf_windstress.csv", 
-                            header = F)
+                            header = FALSE)
 
 colnames(windstress_data) <- c("day", "month", "year", "windstress")
 
@@ -199,7 +200,7 @@ qntls <- quantile(windstress_data$windstress, na.rm = T,
 windstress_df <- data.frame()
 
 for (munida_date in munida_dates) {
-  print(as.Date(munida_date, origin = "1970-01-01"))
+  # print(as.Date(munida_date, origin = "1970-01-01"))
   
   dates_avg <- (as.Date(munida_date, origin = "1970-01-01")-4):as.Date(munida_date, origin = "1970-01-01")
   dates_avg <- as.Date(dates_avg, origin = "1970-01-01")
@@ -227,3 +228,23 @@ windstress_df <-
 write.csv(windstress_df, 
           file = "./data-processed/windstress_data_summarised.csv")
 
+## Merge TS and Windstress data with 'seabird_data_long', and save it ####
+
+all_data_long <-
+  dplyr::left_join(seabird_data,
+                   (windstress_df %>% 
+                      dplyr::mutate(date = as.character(date))),
+                   by = c("date")) %>% 
+  dplyr::left_join(.,
+                   (ts_data_summarised_watermasses %>% 
+                      dplyr::mutate(date = as.character(date),
+                                    taiaroa_east = as.character(taiaroa_east),
+                                    season = NULL)),
+                   by = c("date", "taiaroa_east")) %>% 
+  # Better nomenclature to 'direction'
+  dplyr::mutate(direction = ifelse(direction == "out",
+                                   yes = "eastward",
+                                   no = "westward"))
+
+write.csv(all_data_long,
+          file = "./data-processed/all_data_long.csv")

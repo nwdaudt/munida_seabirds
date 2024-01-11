@@ -420,4 +420,4 @@ all_data_long <-
   dplyr::filter(! count == 0)
 
 write.csv(all_data_long,
-          file = "./data-processed/all_data_long.csv")
+          file = "./data-processed/seabird_data_long.csv")
