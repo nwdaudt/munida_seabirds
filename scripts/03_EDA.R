@@ -239,8 +239,21 @@ pct_watermass_taiaroa_east_season <-
   dplyr::group_by(taiaroa_east, season, water_mass) %>%
   dplyr::summarise(n = n())
 
+pct_watermass_taiaroa_east_season$taiaroa_east <- 
+  factor(pct_watermass_taiaroa_east_season$taiaroa_east,
+         levels = c("TaiaroaEast0.5km", "TaiaroaEast5.10km",
+                    "TaiaroaEast10.15km", "TaiaroaEast15.20km",
+                    "TaiaroaEast20.25km", "TaiaroaEast25.30km",
+                    "TaiaroaEast30.35km", "TaiaroaEast35.40km",
+                    "TaiaroaEast40.45km", "TaiaroaEast45.50km",
+                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"))
+
+pct_watermass_taiaroa_east_season$season <- 
+  factor(pct_watermass_taiaroa_east_season$season,
+         levels = c("summer", "autumn", "winter", "spring"))
+
 gg_pct_watermass_taiaroa_east_season <-
-  ggplot(data = pct_watermass_taiaroa_east_season,
+  ggplot(data = na.omit(pct_watermass_taiaroa_east_season),
          aes(x = taiaroa_east, y = n, fill = water_mass)) + 
   geom_bar(position = "fill", stat = "identity") + 
   scale_fill_brewer(palette = "Accent", name = NULL) + 
