@@ -273,3 +273,43 @@ ggsave(gg_pct_watermass_taiaroa_east_season,
 
 rm("pct_watermass_taiaroa_east_season", "gg_pct_watermass_taiaroa_east_season")
 
+#------------------------------------------------------------------------------#
+## Summarise % of windstress class, by season ---------------------------------#
+#------------------------------------------------------------------------------#
+
+pct_windstress_season <-
+  data %>% 
+  dplyr::distinct(id, season, windstress_class) %>% 
+  dplyr::group_by(season, windstress_class) %>%
+  dplyr::summarise(n = n()) %>% 
+  na.omit()
+
+pct_windstress_season$season <- 
+  factor(pct_windstress_season$season,
+         levels = c("summer", "autumn", "winter", "spring"))
+
+pct_windstress_season$windstress_class <- 
+  factor(pct_windstress_season$windstress_class,
+         levels = c("strong_upfront", "weak_upfront", "weak_downfront", "strong_downfront"))
+
+## Check colour palette
+# RColorBrewer::display.brewer.pal(12, "Paired")
+# RColorBrewer::brewer.pal(12, "Paired")
+
+gg_pct_windstress_season <-
+  ggplot(data = pct_windstress_season,
+         aes(x = season, y = n, fill = windstress_class)) + 
+  geom_bar(position = "fill", stat = "identity") + 
+  scale_fill_manual(values = c("#FF7F00", "#FDBF6F", "#CAB2D6", "#6A3D9A"), name = NULL) +
+  xlab("") + ylab("% windstress class") +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text = element_text(size = 10, colour = "black"),
+        axis.title.y = element_text(size = 10, colour = "black"),
+        axis.line = element_line(colour = "black"),
+        strip.text = element_text(size = 10, colour = "black"),
+        legend.position = "right")
+
+ggsave(gg_pct_windstress_season,
+       filename = "./results/EDA_pct_windstress_season.pdf",
+       height = 8, width = 11, units = "cm")
