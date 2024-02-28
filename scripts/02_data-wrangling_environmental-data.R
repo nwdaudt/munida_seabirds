@@ -323,7 +323,25 @@ all_data_long <-
   # Better nomenclature to 'direction'
   dplyr::mutate(direction = ifelse(direction == "out",
                                    yes = "eastward",
-                                   no = "westward"))
+                                   no = "westward")) %>% 
+  dplyr::select(-X)
 
+## Before saving it, check if there are any duplicates on the data
+tmp <- 
+  all_data_long %>%
+  dplyr::group_by(id, taiaroa_east, direction, latitude, longitude, date, year, month, season, avg_windstress,
+                  windstress_class, sst, sss, avg_sst_grad_km, avg_sss_grad_km, water_mass, species) %>%
+  dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+  dplyr::filter(n > 1L)
+
+# > YES, one. Deal with it:
+
+# Excluded the 'cape pigeon' with count == 1 and kept cape pigeon with count == 3
+all_data_long <- all_data_long[-c(1257),]
+
+# Re-run 'tmp' object above to check -- fine now.
+rm("tmp")
+
+## Save it
 write.csv(all_data_long,
           file = "./data-processed/all_data_long.csv")
