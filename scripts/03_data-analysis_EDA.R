@@ -19,7 +19,7 @@ library(patchwork)
 # library(colorspace)
 
 ## Read data ####
-data <- read.csv("./data-processed/all_data_long.csv")[, -c(1:2)]
+data <- read.csv("./data-processed/all_data_long.csv")[, -1]
 
 ## Format some columns
 data$taiaroa_east <- 
