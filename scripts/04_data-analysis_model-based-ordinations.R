@@ -14,13 +14,14 @@ library(dplyr)
 library(tidyr)
 library(gllvm)
 library(ggplot2)
+library(ggExtra)
 library(patchwork)
 library(RColorBrewer)
 # library(colorspace)
 # library(cowplot)
 
 ## Read data ####
-data <- read.csv("./data-processed/all_data_long.csv")[, -c(1:2)]
+data <- read.csv("./data-processed/all_data_long.csv")[, -1]
 
 ## Format some columns
 data$taiaroa_east <- 
@@ -77,43 +78,108 @@ spp_matrix <-
 
 ## Unconstrained ordination (purely biological) ####
 
-### Run the model
-unconstrained_biol_model <-
+### Run models with 1 and 2 LV, respectively
+unconstrained_biol_model_lv1 <-
+  gllvm::gllvm(y = spp_matrix, 
+               num.lv = 1, 
+               family = "negative.binomial",
+               seed = 321)
+
+unconstrained_biol_model_lv2 <-
   gllvm::gllvm(y = spp_matrix, 
                num.lv = 2, 
                family = "negative.binomial",
                seed = 321)
 
-## Residuals -- look good!
-pdf(file = "./results/gllvm_unconstrained_biol_residuals.pdf")
-plot(unconstrained_biol_model, which = 1:4, mfrow = c(2,2))
-dev.off()
+### Based on the BIC/AIC, choose the best model -- LV == 2
+# BIC(unconstrained_biol_model_lv1, unconstrained_biol_model_lv2)
+# AIC(unconstrained_biol_model_lv1, unconstrained_biol_model_lv2)
 
-# summary(unconstrained_model)
-# ordiplot.gllvm(unconstrained_biol_model, biplot = TRUE, ind.spp = 10)
+### Residuals -- look good for both models, but LV2 slightly better
+# pdf(file = "./results/gllvm_unconstrained_biol_lv1_residuals.pdf")
+# plot(unconstrained_biol_model_lv1, which = 1:4, mfrow = c(2,2))
+# dev.off()
 
-## Get LV values and arrange it in a dataframe to plot
-df_plot_unconstrained_biol_model <-
-  cbind((wide_data %>% dplyr::select(season, taiaroa_east)),
-        as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model)))
+# pdf(file = "./results/gllvm_unconstrained_biol_lv2_residuals.pdf")
+# plot(unconstrained_biol_model_lv2, which = 1:4, mfrow = c(2,2))
+# dev.off()
 
-## Plot colour-coded by 'season' --------------------------------------------- #
-plot_unconstrained_biol_model_season <- 
-  ggplot(data = df_plot_unconstrained_biol_model, 
-         aes(x = LV1, y = LV2, color = season)) +
-  geom_point() + 
-  scale_color_manual(values = c("summer" = "#4E79A7", "autumn" = "#F28E2B", 
-                                "winter" = "#E15759", "spring" = "#76B7B2")) +
-  # coord_cartesian(ylim = c(-2.5,4), xlim = c(-2.5,4)) +
+### Save the model objects
+# saveRDS(unconstrained_biol_model_lv1,
+#         file = "./results/gllvm_unconstrained_biol_lv1_model.rds")
+
+# saveRDS(unconstrained_biol_model_lv2,
+#         file = "./results/gllvm_unconstrained_biol_lv2_model.rds")
+
+### You can load the files back instead of running the models again
+# # unconstrained_biol_model_lv1 <- readRDS("./results/gllvm_unconstrained_biol_lv1_model.rds")
+# unconstrained_biol_model_lv2 <- readRDS("./results/gllvm_unconstrained_biol_lv2_model.rds")
+
+### Get LV values and arrange it in a dataframe to plot
+# df_plot_lv1_unconstr_biol_model <-
+#   cbind(wide_data, 
+#         as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model_lv1)))
+
+df_plot_lv2_unconstr_biol_model <-
+  cbind(wide_data, 
+        as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model_lv2)))
+
+## Plot colour-coded by 'water_mass' ----------------------------------------- #
+
+plot_unconstrained_biol_model_watermass <- 
+  ggplot(
+    data = df_plot_lv2_unconstr_biol_model[!is.na(df_plot_lv2_unconstr_biol_model$water_mass),],
+    aes(x = LV1, y = LV2, color = water_mass)) +
+  ## Plot of LV1 model, but I'll likely not use this...
+    # data = df_plot_lv1_unconstr_biol_model, 
+    # aes(x = V1, y = rep(0, nrow(df_plot_lv1_unconstr_biol_model)), color = water_mass)) +
+  geom_point(alpha = 0.6) + 
+  scale_color_brewer(palette = "Dark2") +
   theme_bw() + 
   theme(axis.title = element_text(size = 14),
         axis.text = element_text(size = 14),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size = 14))
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12),
+        legend.position = "bottom")
+
+plot_unconstrained_biol_model_watermass <- 
+  ggExtra::ggMarginal(plot_unconstrained_biol_model_watermass,
+                      type = "density",
+                      groupColour = TRUE,
+                      groupFill = TRUE)
+
+ggsave(plot_unconstrained_biol_model_watermass,
+       filename = "./results/gllvm_unconstrained_biol_lv2_biplot_watermass.pdf",
+       height = 9, width = 12, units = "cm", dpi = 300)
+
+rm("plot_unconstrained_biol_model_watermass")
+
+## Plot colour-coded by 'season' --------------------------------------------- #
+
+plot_unconstrained_biol_model_season <- 
+  ggplot(data = df_plot_lv2_unconstr_biol_model, 
+         aes(x = LV1, y = LV2, color = season)) +
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c("summer" = "#4E79A7", "autumn" = "#F28E2B", 
+                                "winter" = "#E15759", "spring" = "#76B7B2")) +
+  theme_bw() + 
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 14),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12),
+        legend.position = "bottom")
+
+plot_unconstrained_biol_model_season <- 
+  ggExtra::ggMarginal(plot_unconstrained_biol_model_season,
+                      type = "density",
+                      groupColour = TRUE,
+                      groupFill = TRUE)
 
 ggsave(plot_unconstrained_biol_model_season,
-       filename = "./results/gllvm_unconstrained_biol_biplot_season.pdf",
+       filename = "./results/gllvm_unconstrained_biol_lv2_biplot_season.pdf",
        height = 9, width = 12, units = "cm", dpi = 300)
+
+rm("plot_unconstrained_biol_model_season")
 
 ## Plot colour-coded by 'taiaroa_head' --------------------------------------- #
 
@@ -121,23 +187,242 @@ ggsave(plot_unconstrained_biol_model_season,
 palette_12cols <- colorRampPalette(RColorBrewer::brewer.pal(8, "BrBG"))(12)
 
 plot_unconstrained_biol_model_taiaroa <- 
-  ggplot(data = df_plot_unconstrained_biol_model, 
+  ggplot(data = df_plot_lv2_unconstr_biol_model, 
          aes(x = LV1, y = LV2, color = taiaroa_east)) +
-  geom_point() + 
+  geom_point(alpha = 0.6) + 
   scale_color_manual(values = palette_12cols) +
-  # coord_cartesian(ylim = c(-2.5,4), xlim = c(-2.5,4)) +
   theme_bw() + 
   theme(axis.title = element_text(size = 14),
         axis.text = element_text(size = 14),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size = 14))
+        legend.title = element_blank(),
+        legend.text = element_text(size = 11),
+        legend.position = "left")
+
+plot_unconstrained_biol_model_taiaroa <- 
+  ggExtra::ggMarginal(plot_unconstrained_biol_model_taiaroa,
+                      type = "density",
+                      groupColour = TRUE,
+                      groupFill = TRUE)
 
 ggsave(plot_unconstrained_biol_model_taiaroa,
-       filename = "./results/gllvm_unconstrained_biol_biplot_taiaroa.pdf",
-       height = 10, width = 16, units = "cm", dpi = 300)
+       filename = "./results/gllvm_unconstrained_biol_lv2_biplot_taiaroa.pdf",
+       height = 10, width = 17, units = "cm", dpi = 300)
 
-# Save the model object
-saveRDS(unconstrained_biol_model,
-        file = "./results/gllvm_unconstrained_biol_model.rds")
+rm("plot_unconstrained_biol_model_taiaroa")
 
 ## Unconstrained ordination (including predictors) ####
+
+### Run models with 0, 1 and 2 LV, respectively
+unconstrained_pred_model_lv0 <-
+  gllvm::gllvm(y = spp_matrix, 
+               X = data.frame(season = wide_data$season,
+                              taiaroa_east = wide_data$taiaroa_east,
+                              voyage = wide_data$id),
+               formula = ~ season + taiaroa_east,
+               num.lv = 0, 
+               family = "negative.binomial",
+               row.eff = ~(1|voyage),
+               seed = 321)
+# >> "Standard errors for parameters could not be calculated, due to singular fit."
+
+unconstrained_pred_model_lv1 <-
+  gllvm::gllvm(y = spp_matrix, 
+               X = data.frame(season = wide_data$season,
+                              taiaroa_east = wide_data$taiaroa_east,
+                              voyage = wide_data$id),
+               formula = ~ season + taiaroa_east,
+               num.lv = 1, 
+               family = "negative.binomial",
+               row.eff = ~(1|voyage),
+               seed = 321)
+
+# summary(unconstrained_pred_model_lv1)
+
+unconstrained_pred_model_lv2 <-
+  gllvm::gllvm(y = spp_matrix, 
+               X = data.frame(season = wide_data$season,
+                              taiaroa_east = wide_data$taiaroa_east,
+                              voyage = wide_data$id),
+               formula = ~ season + taiaroa_east,
+               num.lv = 2, 
+               family = "negative.binomial",
+               row.eff = ~(1|voyage),
+               seed = 321)
+
+### Based on the BIC/AIC, choose the best model 
+# -- LV == 1; LV0 seems to have gotten the wrong path during its numerical resolution
+BIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pred_model_lv2)
+AIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pred_model_lv2)
+
+### Residuals -- look good for LV1 and LV2 models, but LV1 slightly better; LV0 terrible
+# pdf(file = "./results/gllvm_unconstrained_pred_lv0_residuals.pdf")
+# plot(unconstrained_pred_model_lv0, which = 1:4, mfrow = c(2,2))
+# dev.off()
+
+# pdf(file = "./results/gllvm_unconstrained_pred_lv1_residuals.pdf")
+# plot(unconstrained_pred_model_lv1, which = 1:4, mfrow = c(2,2))
+# dev.off()
+
+# pdf(file = "./results/gllvm_unconstrained_pred_lv2_residuals.pdf")
+# plot(unconstrained_pred_model_lv2, which = 1:4, mfrow = c(2,2))
+# dev.off()
+
+### Save the model objects
+# saveRDS(unconstrained_pred_model_lv0,
+#         file = "./results/gllvm_unconstrained_pred_lv0_model.rds")
+
+# saveRDS(unconstrained_pred_model_lv1,
+#         file = "./results/gllvm_unconstrained_pred_lv1_model.rds")
+
+# saveRDS(unconstrained_pred_model_lv2,
+#         file = "./results/gllvm_unconstrained_pred_lv2_model.rds")
+
+### You can load the files back instead of running the models again
+# # unconstrained_pred_model_lv0 <- readRDS("./results/gllvm_unconstrained_pred_lv0_model.rds")
+# unconstrained_pred_model_lv1 <- readRDS("./results/gllvm_unconstrained_pred_lv1_model.rds")
+# # unconstrained_pred_model_lv2 <- readRDS("./results/gllvm_unconstrained_pred_lv2_model.rds")
+
+## Comparing predictions between GLLVMs accounting for predictors, with(out) LVs, and raw data ####
+
+## Get predicted/expected values for unconstrained model without LVs [LV == 0] (lv0)
+
+fitmod_lv0 <- data.frame(
+  exp(
+    predict(unconstrained_pred_model_lv0, newX = data.frame(season = wide_data$season,
+                                                            taiaroa_east = wide_data$taiaroa_east))
+  )
+)
+
+fitmod_lv0 <- fitmod_lv0[order(wide_data$season), ]
+
+fitlong_lv0 <- 
+  tidyr::gather(data.frame(site = 1:nrow(fitmod_lv0), fitmod_lv0), 
+                key = "Species", value = "Number", 
+                black_backed_gull:yellow_eye_penguin)
+
+fitlong_lv0 <-
+  cbind(fitlong_lv0, Source = rep("LV = 0", times = nrow(fitlong_lv0)))
+
+## Get predicted/expected values for unconstrained model with [LV == 1] (lv1)
+
+fitmod_lv1 <- data.frame(
+  exp(
+    predict(unconstrained_pred_model_lv1, newX = data.frame(season = wide_data$season,
+                                                            taiaroa_east = wide_data$taiaroa_east))
+  )
+)
+
+fitmod_lv1 <- fitmod_lv1[order(wide_data$season), ]
+
+fitlong_lv1 <- 
+  tidyr::gather(data.frame(site = 1:nrow(fitmod_lv1), fitmod_lv1), 
+                key = "Species", value = "Number", 
+                black_backed_gull:yellow_eye_penguin)
+
+fitlong_lv1 <-
+  cbind(fitlong_lv1, Source = rep("LV = 1", times = nrow(fitlong_lv1)))
+
+## Get predicted/expected values for unconstrained model with [LV == 2] (lv2)
+
+fitmod_lv2 <- data.frame(
+  exp(
+    predict(unconstrained_pred_model_lv2, newX = data.frame(season = wide_data$season,
+                                                            taiaroa_east = wide_data$taiaroa_east))
+  )
+)
+
+fitmod_lv2 <- fitmod_lv2[order(wide_data$season), ]
+
+fitlong_lv2 <- 
+  tidyr::gather(data.frame(site = 1:nrow(fitmod_lv2), fitmod_lv2), 
+                key = "Species", value = "Number", 
+                black_backed_gull:yellow_eye_penguin)
+
+fitlong_lv2 <-
+  cbind(fitlong_lv2, Source = rep("LV = 2", times = nrow(fitlong_lv2)))
+
+## Reshape raw data to the same format
+yord <- spp_matrix[order(wide_data$season), ]
+
+ylong <- 
+  tidyr::gather(data.frame(site = 1:nrow(fitmod_lv0), yord), 
+                key = "Species", value = "Number", 
+                black_backed_gull:yellow_eye_penguin)
+
+ylong <-
+  cbind(ylong, Source = rep("Raw data", times = nrow(ylong)))
+
+rm("yord", "fitmod_lv0", "fitmod_lv1", "fitmod_lv2")
+
+## Bind dataframes
+df_lv0_lv1_lv2_raw <- rbind(fitlong_lv0, fitlong_lv1, fitlong_lv2, ylong)
+
+rm("fitlong_lv0","fitlong_lv1", "fitlong_lv2", "ylong")
+
+## Compare results through a plot
+
+plot_comparing_lv0_lv1_lv2_raw <-
+  ggplot(data = df_lv0_lv1_lv2_raw, 
+         aes(x = site, y = Number, colour = Source, shape = Source)) +
+  geom_point(alpha = 0.5) +
+  scale_color_manual(values = c("#000000", "#F8766D", "skyblue1", "#00BA38")) +
+  facet_wrap(~ Species, scales = "free_y") + 
+  ylab("Number") + xlab("Sample") +
+  theme_bw() +
+  theme(legend.position = c(0.9, 0.1),
+        legend.title = element_blank(),
+        strip.text = element_text(size = 6),
+        axis.text = element_text(size = 6),
+        axis.title = element_text(size = 6))
+
+ggsave(plot_comparing_lv0_lv1_lv2_raw,
+       filename = "./results/comparing_pred_lv0_lv1_lv2_raw.pdf",
+       height = 25, width = 40, units = "cm", dpi = 300)
+
+rm("plot_comparing_lv0_lv1_lv2_raw")
+
+## >> The plot shows that both LV == 1 and LV == 2 have very similar results
+## >> when predicting values, and that LV == 0 do not agree with them showing 
+## >> more variability and sometimes far from the raw data.
+
+## Covariate selection in model 'pred_lv1' [??] #### 
+
+# Only season
+unconstrained_pred_model_lv1_season <-
+  gllvm::gllvm(y = spp_matrix, 
+               X = data.frame(season = wide_data$season,
+                              taiaroa_east = wide_data$taiaroa_east,
+                              voyage = wide_data$id),
+               formula = ~ season,
+               num.lv = 1, 
+               family = "negative.binomial",
+               row.eff = ~(1|voyage),
+               seed = 321)
+
+# Only taiaroa_east
+unconstrained_pred_model_lv1_taiaroa <-
+  gllvm::gllvm(y = spp_matrix, 
+               X = data.frame(season = wide_data$season,
+                              taiaroa_east = wide_data$taiaroa_east,
+                              voyage = wide_data$id),
+               formula = ~ taiaroa_east,
+               num.lv = 1, 
+               family = "negative.binomial",
+               row.eff = ~(1|voyage),
+               seed = 321)
+
+### BIC/AIC
+BIC(unconstrained_pred_model_lv1, unconstrained_pred_model_lv1_season, unconstrained_pred_model_lv1_taiaroa)
+AIC(unconstrained_pred_model_lv1, unconstrained_pred_model_lv1_season, unconstrained_pred_model_lv1_taiaroa)
+
+
+# 'seasons' (summer == intercept)
+gllvm::coefplot(unconstrained_pred_model_lv1,
+                which.Xcoef = c(1:3),
+                order = FALSE)
+
+# Selected 'taiaroa_head' (TaiaroaEast0.5km == intercept) 
+gllvm::coefplot(unconstrained_pred_model_lv1,
+                which.Xcoef = c(4,7,10,13),
+                order = FALSE)
+
