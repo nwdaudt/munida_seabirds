@@ -1,4 +1,9 @@
 data-raw/
+data-processed/
+rmd_tex/
+
+## RDS files
+results/*.rds
 
 # History files
 .Rhistory
