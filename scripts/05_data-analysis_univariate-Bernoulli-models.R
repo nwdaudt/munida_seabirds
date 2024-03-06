@@ -15,7 +15,9 @@ library(tidyr)
 library(ggplot2)
 
 ## Read data ####
-data <- read.csv("./data-processed/all_data_long.csv")[, -1]
+data <- 
+  read.csv("./data-processed/all_data_long.csv")[, -1] %>% 
+  dplyr::filter(! year == "2012")
 
 ## Format some columns
 data$taiaroa_east <- 
@@ -70,8 +72,6 @@ long_data_pa <-
                       values_to = "p_a") %>% 
   # and transform counts to presence-absence ("p_a") [0,1]
   dplyr::mutate(p_a = replace(p_a, p_a > 0, 1)) %>% 
-  # Remove year 2012
-  dplyr::filter(year > 2012)%>% 
   # Create 'dist_coast', with 'centroid' distance from Taiaroa Head
   dplyr::mutate(dist_coast = case_when(
     taiaroa_east == "TaiaroaEast0.5km" ~ 2.5,
@@ -135,8 +135,10 @@ plot_prob_occ_species_year <-
        aes(x = taiaroa_east, y = yfit, group = as.factor(year), colour = as.factor(year))) +
   geom_line() + 
   scale_color_brewer(palette = "Reds") +
-  scale_x_discrete(labels = c("0-5 km", "", "", "", "", "25-30 km", "", "", "", "", "", "55-60 km")) +
-  ylab("Predicted probability of occurrence") + xlab("") +
+  scale_x_discrete(labels = c("0-5 km", "", "", "", "", 
+                              "25-30 km", "", "", "", "", "", "55-60 km")) +
+  ylab("Predicted yearly probability of occurrence, conditional on distance from coast") + 
+  xlab("") +
   facet_wrap(~ species, scales = "fixed") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -199,8 +201,10 @@ plot_prob_occ_species_seasons <-
          aes(x = taiaroa_east, y = yfit, group = season, colour = season)) +
   geom_line() + 
   scale_color_manual(values = c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2")) +
-  scale_x_discrete(labels = c("0-5 km", "", "", "", "", "25-30 km", "", "", "", "", "", "55-60 km")) +
-  ylab("Predicted probability of occurrence") + xlab("") +
+  scale_x_discrete(labels = c("0-5 km", "", "", "", "", 
+                              "25-30 km", "", "", "", "", "", "55-60 km")) +
+  ylab("Predicted seasonal probability of occurrence, conditional on distance from coast") + 
+  xlab("") +
   facet_wrap(~ species, scales = "fixed") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),

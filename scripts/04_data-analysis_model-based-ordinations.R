@@ -21,7 +21,9 @@ library(RColorBrewer)
 # library(cowplot)
 
 ## Read data ####
-data <- read.csv("./data-processed/all_data_long.csv")[, -1]
+data <- 
+  read.csv("./data-processed/all_data_long.csv")[, -1] %>% 
+  dplyr::filter(! year == "2012")
 
 ## Format some columns
 data$taiaroa_east <- 
@@ -91,9 +93,16 @@ unconstrained_biol_model_lv2 <-
                family = "negative.binomial",
                seed = 321)
 
-### Based on the BIC/AIC, choose the best model -- LV == 2
+### Based on the BIC/AIC, choose the best model -- LV == 1
 # BIC(unconstrained_biol_model_lv1, unconstrained_biol_model_lv2)
+#                               df      BIC
+# unconstrained_biol_model_lv1 117 15157.04
+# unconstrained_biol_model_lv2 155 15672.03
+
 # AIC(unconstrained_biol_model_lv1, unconstrained_biol_model_lv2)
+#                               df      AIC
+# unconstrained_biol_model_lv1 117 14703.02
+# unconstrained_biol_model_lv2 155 15070.55
 
 ### Residuals -- look good for both models, but LV2 slightly better
 # pdf(file = "./results/gllvm_unconstrained_biol_lv1_residuals.pdf")
@@ -112,32 +121,36 @@ unconstrained_biol_model_lv2 <-
 #         file = "./results/gllvm_unconstrained_biol_lv2_model.rds")
 
 ### You can load the files back instead of running the models again
-# # unconstrained_biol_model_lv1 <- readRDS("./results/gllvm_unconstrained_biol_lv1_model.rds")
-# unconstrained_biol_model_lv2 <- readRDS("./results/gllvm_unconstrained_biol_lv2_model.rds")
+# unconstrained_biol_model_lv1 <- readRDS("./results/gllvm_unconstrained_biol_lv1_model.rds")
+# # unconstrained_biol_model_lv2 <- readRDS("./results/gllvm_unconstrained_biol_lv2_model.rds")
 
 ### Get LV values and arrange it in a dataframe to plot
-# df_plot_lv1_unconstr_biol_model <-
-#   cbind(wide_data, 
-#         as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model_lv1)))
+df_plot_lv1_unconstr_biol_model <-
+  cbind(wide_data,
+        as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model_lv1)))
 
-df_plot_lv2_unconstr_biol_model <-
-  cbind(wide_data, 
-        as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model_lv2)))
+# df_plot_lv2_unconstr_biol_model <-
+#   cbind(wide_data, 
+#         as.data.frame(gllvm::getLV.gllvm(unconstrained_biol_model_lv2)))
 
 ## Plot colour-coded by 'water_mass' ----------------------------------------- #
 
 plot_unconstrained_biol_model_watermass <- 
   ggplot(
-    data = df_plot_lv2_unconstr_biol_model[!is.na(df_plot_lv2_unconstr_biol_model$water_mass),],
-    aes(x = LV1, y = LV2, color = water_mass)) +
+    # data = df_plot_lv2_unconstr_biol_model[!is.na(df_plot_lv2_unconstr_biol_model$water_mass),],
+    # aes(x = LV1, y = LV2, color = water_mass)) +
   ## Plot of LV1 model, but I'll likely not use this...
-    # data = df_plot_lv1_unconstr_biol_model, 
-    # aes(x = V1, y = rep(0, nrow(df_plot_lv1_unconstr_biol_model)), color = water_mass)) +
+    data = df_plot_lv1_unconstr_biol_model[!is.na(df_plot_lv1_unconstr_biol_model$water_mass),],
+    aes(x = V1, 
+        y = rep(0, nrow(df_plot_lv1_unconstr_biol_model[!is.na(df_plot_lv1_unconstr_biol_model$water_mass),])), 
+        color = water_mass)) +
   geom_point(alpha = 0.6) + 
   scale_color_brewer(palette = "Dark2") +
+  xlab("Latent Variable 1") + ylab("") +
   theme_bw() + 
-  theme(axis.title = element_text(size = 14),
-        axis.text = element_text(size = 14),
+  theme(axis.title.x = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_blank(),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         legend.position = "bottom")
@@ -149,7 +162,7 @@ plot_unconstrained_biol_model_watermass <-
                       groupFill = TRUE)
 
 ggsave(plot_unconstrained_biol_model_watermass,
-       filename = "./results/gllvm_unconstrained_biol_lv2_biplot_watermass.pdf",
+       filename = "./results/gllvm_unconstrained_biol_lv1_biplot_watermass.pdf",
        height = 9, width = 12, units = "cm", dpi = 300)
 
 rm("plot_unconstrained_biol_model_watermass")
@@ -157,14 +170,18 @@ rm("plot_unconstrained_biol_model_watermass")
 ## Plot colour-coded by 'season' --------------------------------------------- #
 
 plot_unconstrained_biol_model_season <- 
-  ggplot(data = df_plot_lv2_unconstr_biol_model, 
-         aes(x = LV1, y = LV2, color = season)) +
+  ggplot(data = df_plot_lv1_unconstr_biol_model, 
+         aes(x = V1, 
+             y = rep(0, times = nrow(df_plot_lv1_unconstr_biol_model)),
+             color = season)) +
   geom_point(alpha = 0.6) + 
   scale_color_manual(values = c("summer" = "#4E79A7", "autumn" = "#F28E2B", 
                                 "winter" = "#E15759", "spring" = "#76B7B2")) +
+  xlab("Latent Variable 1") + ylab("") +
   theme_bw() + 
-  theme(axis.title = element_text(size = 14),
-        axis.text = element_text(size = 14),
+  theme(axis.title.x = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_blank(),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         legend.position = "bottom")
@@ -176,7 +193,7 @@ plot_unconstrained_biol_model_season <-
                       groupFill = TRUE)
 
 ggsave(plot_unconstrained_biol_model_season,
-       filename = "./results/gllvm_unconstrained_biol_lv2_biplot_season.pdf",
+       filename = "./results/gllvm_unconstrained_biol_lv1_biplot_season.pdf",
        height = 9, width = 12, units = "cm", dpi = 300)
 
 rm("plot_unconstrained_biol_model_season")
@@ -187,15 +204,19 @@ rm("plot_unconstrained_biol_model_season")
 palette_12cols <- colorRampPalette(RColorBrewer::brewer.pal(8, "BrBG"))(12)
 
 plot_unconstrained_biol_model_taiaroa <- 
-  ggplot(data = df_plot_lv2_unconstr_biol_model, 
-         aes(x = LV1, y = LV2, color = taiaroa_east)) +
+  ggplot(data = df_plot_lv1_unconstr_biol_model, 
+         aes(x = V1, 
+             y = rep(0, times = nrow(df_plot_lv1_unconstr_biol_model)), 
+             color = taiaroa_east)) +
   geom_point(alpha = 0.6) + 
   scale_color_manual(values = palette_12cols) +
+  xlab("Latent Variable 1") + ylab("") +
   theme_bw() + 
-  theme(axis.title = element_text(size = 14),
-        axis.text = element_text(size = 14),
+  theme(axis.title.x = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_blank(),
         legend.title = element_blank(),
-        legend.text = element_text(size = 11),
+        legend.text = element_text(size = 12),
         legend.position = "left")
 
 plot_unconstrained_biol_model_taiaroa <- 
@@ -205,7 +226,7 @@ plot_unconstrained_biol_model_taiaroa <-
                       groupFill = TRUE)
 
 ggsave(plot_unconstrained_biol_model_taiaroa,
-       filename = "./results/gllvm_unconstrained_biol_lv2_biplot_taiaroa.pdf",
+       filename = "./results/gllvm_unconstrained_biol_lv1_biplot_taiaroa.pdf",
        height = 10, width = 17, units = "cm", dpi = 300)
 
 rm("plot_unconstrained_biol_model_taiaroa")
@@ -223,7 +244,8 @@ unconstrained_pred_model_lv0 <-
                family = "negative.binomial",
                row.eff = ~(1|voyage),
                seed = 321)
-# >> "Standard errors for parameters could not be calculated, due to singular fit."
+
+# summary(unconstrained_pred_model_lv0)
 
 unconstrained_pred_model_lv1 <-
   gllvm::gllvm(y = spp_matrix, 
@@ -236,8 +258,6 @@ unconstrained_pred_model_lv1 <-
                row.eff = ~(1|voyage),
                seed = 321)
 
-# summary(unconstrained_pred_model_lv1)
-
 unconstrained_pred_model_lv2 <-
   gllvm::gllvm(y = spp_matrix, 
                X = data.frame(season = wide_data$season,
@@ -249,10 +269,18 @@ unconstrained_pred_model_lv2 <-
                row.eff = ~(1|voyage),
                seed = 321)
 
-### Based on the BIC/AIC, choose the best model 
-# -- LV == 1; LV0 seems to have gotten the wrong path during its numerical resolution
-BIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pred_model_lv2)
-AIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pred_model_lv2)
+### Based on the BIC/AIC, choose the best model -- LV == 0
+# BIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pred_model_lv2)
+#                               df      BIC
+# unconstrained_pred_model_lv0 625 16287.31
+# unconstrained_pred_model_lv1 664 16516.65
+# unconstrained_pred_model_lv2 702 16740.11
+
+# AIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pred_model_lv2)
+#                               df      AIC
+# unconstrained_pred_model_lv0 625 13861.98
+# unconstrained_pred_model_lv1 664 13939.98
+# unconstrained_pred_model_lv2 702 14015.98
 
 ### Residuals -- look good for LV1 and LV2 models, but LV1 slightly better; LV0 terrible
 # pdf(file = "./results/gllvm_unconstrained_pred_lv0_residuals.pdf")
@@ -278,8 +306,8 @@ AIC(unconstrained_pred_model_lv0, unconstrained_pred_model_lv1, unconstrained_pr
 #         file = "./results/gllvm_unconstrained_pred_lv2_model.rds")
 
 ### You can load the files back instead of running the models again
-# # unconstrained_pred_model_lv0 <- readRDS("./results/gllvm_unconstrained_pred_lv0_model.rds")
-# unconstrained_pred_model_lv1 <- readRDS("./results/gllvm_unconstrained_pred_lv1_model.rds")
+# unconstrained_pred_model_lv0 <- readRDS("./results/gllvm_unconstrained_pred_lv0_model.rds")
+# # unconstrained_pred_model_lv1 <- readRDS("./results/gllvm_unconstrained_pred_lv1_model.rds")
 # # unconstrained_pred_model_lv2 <- readRDS("./results/gllvm_unconstrained_pred_lv2_model.rds")
 
 ## Comparing predictions between GLLVMs accounting for predictors, with(out) LVs, and raw data ####
@@ -381,48 +409,59 @@ ggsave(plot_comparing_lv0_lv1_lv2_raw,
 
 rm("plot_comparing_lv0_lv1_lv2_raw")
 
-## >> The plot shows that both LV == 1 and LV == 2 have very similar results
-## >> when predicting values, and that LV == 0 do not agree with them showing 
-## >> more variability and sometimes far from the raw data.
+## >> The plot shows that all, LV ==0, LV == 1 and LV == 2 have very similar 
+## >> results when predicting values.
 
-## Covariate selection in model 'pred_lv1' [??] #### 
+## Covariate selection in model 'pred_lv0' [??] #### 
 
 # Only season
-unconstrained_pred_model_lv1_season <-
+unconstrained_pred_model_lv0_season <-
   gllvm::gllvm(y = spp_matrix, 
                X = data.frame(season = wide_data$season,
                               taiaroa_east = wide_data$taiaroa_east,
                               voyage = wide_data$id),
                formula = ~ season,
-               num.lv = 1, 
+               num.lv = 0, 
                family = "negative.binomial",
                row.eff = ~(1|voyage),
                seed = 321)
 
 # Only taiaroa_east
-unconstrained_pred_model_lv1_taiaroa <-
+unconstrained_pred_model_lv0_taiaroa <-
   gllvm::gllvm(y = spp_matrix, 
                X = data.frame(season = wide_data$season,
                               taiaroa_east = wide_data$taiaroa_east,
                               voyage = wide_data$id),
                formula = ~ taiaroa_east,
-               num.lv = 1, 
+               num.lv = 0, 
                family = "negative.binomial",
                row.eff = ~(1|voyage),
                seed = 321)
 
 ### BIC/AIC
-BIC(unconstrained_pred_model_lv1, unconstrained_pred_model_lv1_season, unconstrained_pred_model_lv1_taiaroa)
-AIC(unconstrained_pred_model_lv1, unconstrained_pred_model_lv1_season, unconstrained_pred_model_lv1_taiaroa)
+BIC(unconstrained_pred_model_lv0, 
+    unconstrained_pred_model_lv0_season, 
+    unconstrained_pred_model_lv0_taiaroa)
+#                                       df      BIC
+# unconstrained_pred_model_lv0         625 16287.31
+# unconstrained_pred_model_lv0_season  196 15240.57
+# unconstrained_pred_model_lv0_taiaroa 508 16808.85
 
+AIC(unconstrained_pred_model_lv0, 
+    unconstrained_pred_model_lv0_season, 
+    unconstrained_pred_model_lv0_taiaroa)
+#                                       df      AIC
+# unconstrained_pred_model_lv0         625 13861.98
+# unconstrained_pred_model_lv0_season  196 14479.99
+# unconstrained_pred_model_lv0_taiaroa 508 14837.54
 
 # 'seasons' (summer == intercept)
-gllvm::coefplot(unconstrained_pred_model_lv1,
+gllvm::coefplot(unconstrained_pred_model_lv0_season,
                 which.Xcoef = c(1:3),
                 order = FALSE)
 
-# Selected 'taiaroa_head' (TaiaroaEast0.5km == intercept) 
-gllvm::coefplot(unconstrained_pred_model_lv1,
-                which.Xcoef = c(4,7,10,13),
-                order = FALSE)
+# # Selected 'taiaroa_head' (TaiaroaEast0.5km == intercept) 
+# gllvm::coefplot(unconstrained_pred_model_lv0_season,
+#                 which.Xcoef = c(4,7,10,13),
+#                 order = FALSE)
 

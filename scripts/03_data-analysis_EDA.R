@@ -12,14 +12,19 @@
 
 ## Libraries ####
 library(dplyr)
+library(tidyr)
+library(forcats)
 library(ggplot2)
 library(patchwork)
+
 # library(cowplot)
 # library(RColorBrewer)
 # library(colorspace)
 
 ## Read data ####
-data <- read.csv("./data-processed/all_data_long.csv")[, -1]
+data <- 
+  read.csv("./data-processed/all_data_long.csv")[, -1] %>% 
+  dplyr::filter(! year == "2012")
 
 ## Format some columns
 data$taiaroa_east <- 
@@ -53,8 +58,7 @@ data$count <- as.numeric(data$count)
 ## four_colour_palette_discrete 
 # palette.colors(palette = "Tableau 10")[1:4]
 
-#------------------------------------------------------------------------------#
-## Summarise number of samples, by direction, in each 5 km transect -----------#
+## Summarise number of samples, by direction /5 km transect --------####
 #------------------------------------------------------------------------------#
 n_sample_taiaroa_east <-
   data %>% 
@@ -82,8 +86,7 @@ ggsave(gg_n_sample_taiaroa_east,
 
 rm("n_sample_taiaroa_east", "gg_n_sample_taiaroa_east")
 
-#------------------------------------------------------------------------------#
-## Summarise number of species, by direction, in each 5 km transect -----------#
+## Summarise number of species, by direction /5 km transect --------####
 #------------------------------------------------------------------------------#
 n_spp_taiaroa_east <-
   data %>% 
@@ -111,8 +114,7 @@ ggsave(gg_n_spp_taiaroa_east,
 
 rm("n_spp_taiaroa_east", "gg_n_spp_taiaroa_east")
 
-#------------------------------------------------------------------------------#
-## Summarise number of species and total number of birds, by season (overall) -#
+## Summarise number of species and total number of birds, by season (overall) -####
 #------------------------------------------------------------------------------#
 
 ## Species richness
@@ -175,9 +177,7 @@ ggsave(gg_spprichness_nbirds_season,
 
 rm("gg_n_spp_season", "gg_n_birds_season", "gg_spprichness_nbirds_season")
 
-#------------------------------------------------------------------------------#
-## Summarise number of species and total number of birds, ---------------------#
-## on each 5 km transect ------------------------------------------------------#
+## Summarise number of species and total number of birds, /5 km transect----####
 #------------------------------------------------------------------------------#
 
 ## Note: using the same summarised objects from above
@@ -229,8 +229,103 @@ rm("gg_n_spp_taiaroa_east_season", "gg_n_birds_taiaroa_east_season", "gg_spprich
    "n_spp_taiaroa_east_season", "overall_mean_n_spp_taiaroa_east",
    "n_birds_taiaroa_east_season", "overall_log10mean_n_birds_taiaroa_east")
 
+## Frequency of occurrence and numeric frequency, by season ----------------####
 #------------------------------------------------------------------------------#
-## Summarise % of each water mass, in each 5 km transect ----------------------#
+
+# First, transform data into wide format
+data_wide <- 
+  data %>% 
+  tidyr::pivot_wider(names_from = species,
+                     values_from = count,
+                     values_fill = 0)
+
+# Get spp and sp-only column names
+spp_cols <- colnames(data_wide[,c(17:74)]) ## All seabirds
+sp_only_cols <- spp_cols[! grepl(pattern = "unknown", x = spp_cols)] ## Only species-level
+
+# Calculate total number of birds per sample (total_birds)
+data_wide <- 
+  data_wide %>% 
+  dplyr::mutate(total_birds = rowSums(across(all_of(spp_cols)))) %>% 
+  dplyr::select(id, season, all_of(sp_only_cols), total_birds) %>% 
+  dplyr::group_by(id, season) %>% 
+  dplyr::summarise(across(everything(), list(sum)))
+
+colnames(data_wide) <- c("id", "season", sp_only_cols, "total_birds")
+
+# Specify functions to calculate frequency of occurrence (freq_occ) and numeric frequency (freq_num)
+funs <- list(freq_occ = ~ sum(.x >= 1)/n() *100,
+             freq_num = ~ sum(.x)/sum(dplyr::pick(total_birds)) *100)
+
+data_species_fo_nf <-
+  data_wide %>% 
+  dplyr::group_by(season) %>%
+  dplyr::summarise(across(all_of(sp_only_cols), .fns = funs)) %>%
+  tidyr::pivot_longer(cols = !season, 
+                      names_to = "species_freq",
+                      values_to = "value") %>%
+  dplyr::mutate(value = round(value, digits = 2)) %>% 
+  # split name into variables
+  tidyr::separate(species_freq, 
+                  into = c("species", "freq"),
+                  sep = -8) %>% 
+  # remove an extra underline
+  dplyr::mutate(species = stringr::str_sub(species, end = -2))
+
+rm("funs")
+
+#### FO/NF plots
+
+## Frequency of occurrence
+plot_freq_occ <-
+  data_species_fo_nf %>% 
+  dplyr::filter(freq == "freq_occ") %>% 
+  ggplot(., aes(x = forcats::fct_reorder(as.factor(species), value), 
+                y = value, 
+                fill = season)) + 
+  geom_col() +
+  scale_fill_manual(values = c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2"), 
+                    name = NULL) +
+  facet_grid(~ season) +
+  ylab("Frequency of occurrence (%)") + xlab ("") +
+  coord_flip() +
+  theme_bw() + 
+  theme(legend.position = "none",
+        axis.text = element_text(size = 7, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        axis.title.x = element_text(size = 8),
+        strip.text = element_text(size = 8))
+
+## Relative abundance (numeric frequency)
+plot_freq_num <-
+  data_species_fo_nf %>% 
+  dplyr::filter(freq == "freq_num") %>% 
+  ggplot(., aes(x = forcats::fct_reorder(as.factor(species), value), 
+                y = value, 
+                fill = season)) + 
+  geom_col() +
+  scale_fill_manual(values = c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2")) +
+  facet_grid(~ season) +
+  ylab("Relative abundance (%)") + xlab ("") +
+  coord_flip() +
+  theme_bw() + 
+  theme(legend.position = "none",
+        axis.text = element_text(size = 7, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        axis.title.x = element_text(size = 8),
+        strip.text = element_text(size = 8))
+
+## Patchwork these plots and save it
+freqs_occ_num <-
+  plot_freq_occ / plot_freq_num
+
+ggsave(freqs_occ_num,
+       filename = "./results/EDA_sp_frqs-occ-num.pdf",
+       width = 16, height = 25, units = "cm", dpi = 300)
+
+rm("plot_freq_occ", "plot_freq_num", "freqs_occ_num")
+
+## Summarise % of each water mass /5 km transect -------------------####
 #------------------------------------------------------------------------------#
 wm_data <- read.csv("./data-processed/ts_data_summarised_watermasses.csv")
 
@@ -273,8 +368,7 @@ ggsave(gg_pct_watermass_taiaroa_east_season,
 
 rm("pct_watermass_taiaroa_east_season", "gg_pct_watermass_taiaroa_east_season")
 
-#------------------------------------------------------------------------------#
-## Summarise % of windstress class, by season ---------------------------------#
+## Summarise % of windstress class, by season ------------------------------####
 #------------------------------------------------------------------------------#
 
 pct_windstress_season <-
@@ -313,3 +407,4 @@ gg_pct_windstress_season <-
 ggsave(gg_pct_windstress_season,
        filename = "./results/EDA_pct_windstress_season.pdf",
        height = 8, width = 11, units = "cm")
+
