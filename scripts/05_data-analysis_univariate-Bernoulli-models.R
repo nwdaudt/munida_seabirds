@@ -72,7 +72,7 @@ long_data_pa <-
                       values_to = "p_a") %>% 
   # and transform counts to presence-absence ("p_a") [0,1]
   dplyr::mutate(p_a = replace(p_a, p_a > 0, 1)) %>% 
-  # Create 'dist_coast', with 'centroid' distance from Taiaroa Head
+  ### Create 'dist_coast', with 'centroid' distance from Taiaroa Head
   dplyr::mutate(dist_coast = case_when(
     taiaroa_east == "TaiaroaEast0.5km" ~ 2.5,
     taiaroa_east == "TaiaroaEast5.10km" ~ 7.5,

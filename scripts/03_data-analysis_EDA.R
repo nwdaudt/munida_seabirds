@@ -46,6 +46,28 @@ data$season <-
 
 data$count <- as.numeric(data$count)
 
+
+##  ---- Transform the data set from long to (simplified) wide format  ---- ##
+data_wide <- 
+  data %>% 
+  tidyr::pivot_wider(names_from = species,
+                     values_from = count,
+                     values_fill = 0)
+
+# Get spp and sp-only column names
+spp_cols <- colnames(data_wide[,c(17:74)]) ## All seabirds
+sp_only_cols <- spp_cols[! grepl(pattern = "unknown", x = spp_cols)] ## Only species-level
+
+# Calculate total number of birds per sample (total_birds)
+data_wide <- 
+  data_wide %>% 
+  dplyr::mutate(total_birds = rowSums(across(all_of(spp_cols)))) %>% 
+  dplyr::select(id, season, year, all_of(sp_only_cols), total_birds) %>% 
+  dplyr::group_by(id, season, year) %>% 
+  dplyr::summarise(across(everything(), list(sum)))
+
+colnames(data_wide) <- c("id", "season", "year", sp_only_cols, "total_birds")
+
 ## EDA ####
 
 #------------------------------------------------------------------------------#
@@ -58,7 +80,23 @@ data$count <- as.numeric(data$count)
 ## four_colour_palette_discrete 
 # palette.colors(palette = "Tableau 10")[1:4]
 
-## Summarise number of samples, by direction /5 km transect --------####
+## Effort summary ----------------------------------------------------------####
+#------------------------------------------------------------------------------#
+
+effort_summary <-
+  data_wide %>% 
+  dplyr::group_by(season) %>% 
+  dplyr::summarise(number_of_voyages = n_distinct(id),
+                   number_of_years_sampled = n_distinct(year),
+                   number_of_species = sum(colSums(across(all_of(sp_only_cols))) > 0),
+                   number_of_individuals = sum(total_birds))
+
+# write.csv(effort_summary,
+#           "./results/seasonal-effort-summary.csv")
+
+rm("effort_summary")
+
+## Summarise number of samples, by direction /5 km transect ----------------####
 #------------------------------------------------------------------------------#
 n_sample_taiaroa_east <-
   data %>% 
@@ -86,7 +124,7 @@ ggsave(gg_n_sample_taiaroa_east,
 
 rm("n_sample_taiaroa_east", "gg_n_sample_taiaroa_east")
 
-## Summarise number of species, by direction /5 km transect --------####
+## Summarise number of species, by direction /5 km transect ----------------####
 #------------------------------------------------------------------------------#
 n_spp_taiaroa_east <-
   data %>% 
@@ -114,7 +152,7 @@ ggsave(gg_n_spp_taiaroa_east,
 
 rm("n_spp_taiaroa_east", "gg_n_spp_taiaroa_east")
 
-## Summarise number of species and total number of birds, by season (overall) -####
+## Summarise number of species and total number of birds, by season (overall) ####
 #------------------------------------------------------------------------------#
 
 ## Species richness
@@ -232,27 +270,6 @@ rm("gg_n_spp_taiaroa_east_season", "gg_n_birds_taiaroa_east_season", "gg_spprich
 ## Frequency of occurrence and numeric frequency, by season ----------------####
 #------------------------------------------------------------------------------#
 
-# First, transform data into wide format
-data_wide <- 
-  data %>% 
-  tidyr::pivot_wider(names_from = species,
-                     values_from = count,
-                     values_fill = 0)
-
-# Get spp and sp-only column names
-spp_cols <- colnames(data_wide[,c(17:74)]) ## All seabirds
-sp_only_cols <- spp_cols[! grepl(pattern = "unknown", x = spp_cols)] ## Only species-level
-
-# Calculate total number of birds per sample (total_birds)
-data_wide <- 
-  data_wide %>% 
-  dplyr::mutate(total_birds = rowSums(across(all_of(spp_cols)))) %>% 
-  dplyr::select(id, season, all_of(sp_only_cols), total_birds) %>% 
-  dplyr::group_by(id, season) %>% 
-  dplyr::summarise(across(everything(), list(sum)))
-
-colnames(data_wide) <- c("id", "season", sp_only_cols, "total_birds")
-
 # Specify functions to calculate frequency of occurrence (freq_occ) and numeric frequency (freq_num)
 funs <- list(freq_occ = ~ sum(.x >= 1)/n() *100,
              freq_num = ~ sum(.x)/sum(dplyr::pick(total_birds)) *100)
@@ -325,7 +342,7 @@ ggsave(freqs_occ_num,
 
 rm("plot_freq_occ", "plot_freq_num", "freqs_occ_num")
 
-## Summarise % of each water mass /5 km transect -------------------####
+## Summarise % of each water mass /5 km transect ---------------------------####
 #------------------------------------------------------------------------------#
 wm_data <- read.csv("./data-processed/ts_data_summarised_watermasses.csv")
 
