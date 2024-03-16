@@ -643,6 +643,7 @@ gllvm_spp_ordered <- c(
   gllvm_spp[31], gllvm_spp[24], gllvm_spp[26], gllvm_spp[22]
 )
 
+At.y <- seq(1, length(gllvm_spp))
 
 # 'seasons' (summer == intercept)
 pdf(file = "./results/gllvm_unconstrained_pred_lv0_distcoast_coefplot-season.pdf",
