@@ -46,7 +46,6 @@ data$season <-
 
 data$count <- as.numeric(data$count)
 
-
 ##  ---- Transform the data set from long to (simplified) wide format  ---- ##
 data_wide <- 
   data %>% 
@@ -424,69 +423,3 @@ gg_pct_windstress_season <-
 ggsave(gg_pct_windstress_season,
        filename = "./results/EDA_pct_windstress_season.pdf",
        height = 8, width = 11, units = "cm")
-
-
-## Species counts related to SOI phases ####
-
-soi_phases <- 
-  read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv") %>% 
-  dplyr::filter(year >= 2015) %>% 
-  dplyr::mutate(month_number = match(month, month.abb)) %>% 
-  dplyr::select(year, month_number, soi_phase)
-
-data_soi <- 
-  dplyr::left_join(data[data$direction == "westward", ],
-                   soi_phases,
-                   by = join_by(year == year, month == month_number))
-
-data_soi_plot <- 
-  data_soi %>% 
-  dplyr::group_by(id, species, soi_phase) %>% 
-  dplyr::summarise(count_id = sum(count)) %>% 
-  dplyr::ungroup() %>% 
-  # 2023 SOI data still not released, which returned NA above - so filter them away
-  dplyr::filter(! is.na(soi_phase)) %>% 
-  # Keep only species identified to the species level
-  dplyr::filter(species %in% sp_only_cols) %>% 
-  # Select columns for plot
-  dplyr::select(species, count_id, soi_phase)
-
-less_than_3_obs <-
-  # Get species names and number of occurrences
-  data.frame(
-    species = sp_only_cols,
-    n_occ = apply(data_wide[sp_only_cols], MARGIN = 2, function(x) sum(x >= 1)),
-    row.names = NULL) %>%
-  # Filter and pull species names
-  dplyr::filter(n_occ < 3) %>%
-  dplyr::pull(species)
-
-
-data_soi_plot <-
-  data_soi_plot %>% 
-  dplyr::filter(! species %in% less_than_3_obs)
-
-violin_counts_soi <- 
-  ggplot(data = data_soi_plot,
-         aes(y = count_id,
-             x = as.factor(soi_phase),
-             fill = soi_phase)) +
-  geom_violin() + 
-  scale_fill_brewer(palette = "Set1", name = NULL) +
-  facet_wrap(~ species, scales = "free_y") +
-  ylab("log10(count)") + xlab("") +
-  theme_bw() + 
-  theme(strip.text = element_text(size = 6.5),
-        # axis.text.x = element_text(size = 7, angle = 45, hjust = 1, vjust = 1),
-        axis.text.x = element_blank(),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 9),
-        legend.position = c(0.75, 0.05)) +
-  guides(fill = guide_legend(nrow = 1))
-
-ggsave(violin_counts_soi,
-       filename = "./results/SOI_violin-plot_total-counts-by-voyage.pdf",
-       height = 16, width = 32, units = "cm", dpi = 300)
-
-rm("soi_phases", "data_soi", "data_soi_plot", 
-   "less_than_3_obs", "violin_counts_soi")
