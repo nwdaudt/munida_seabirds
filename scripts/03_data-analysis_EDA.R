@@ -34,7 +34,10 @@ data$taiaroa_east <-
                     "TaiaroaEast20.25km", "TaiaroaEast25.30km",
                     "TaiaroaEast30.35km", "TaiaroaEast35.40km",
                     "TaiaroaEast40.45km", "TaiaroaEast45.50km",
-                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"))
+                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"),
+         labels = c("0-5 km", "5-10 km", "10-15 km", "15-20 km",
+                    "20-25 km", "25-30 km", "30-35 km", "35-40 km",
+                    "40-45 km", "45-50 km", "50-55 km", "55-60 km"))
 
 data$direction <- 
   factor(data$direction,
@@ -42,7 +45,8 @@ data$direction <-
 
 data$season <- 
   factor(data$season,
-         levels = c("summer", "autumn", "winter", "spring"))
+         levels = c("summer", "autumn", "winter", "spring"),
+         labels = c("Summer", "Autumn", "Winter", "Spring"))
 
 data$count <- as.numeric(data$count)
 
@@ -127,6 +131,7 @@ rm("n_sample_taiaroa_east", "gg_n_sample_taiaroa_east")
 #------------------------------------------------------------------------------#
 n_spp_taiaroa_east <-
   data %>% 
+  dplyr::filter(species %in% sp_only_cols) %>% 
   dplyr::group_by(id, taiaroa_east, direction) %>% 
   dplyr::summarise(n = n_distinct(species))
 
@@ -155,31 +160,33 @@ rm("n_spp_taiaroa_east", "gg_n_spp_taiaroa_east")
 #------------------------------------------------------------------------------#
 
 ## Species richness
-n_spp_taiaroa_east_season <-
+n_spp_season <-
   data %>% 
-  dplyr::group_by(id, taiaroa_east, season) %>% 
+  dplyr::filter(species %in% sp_only_cols) %>% 
+  dplyr::group_by(id, season) %>% 
   dplyr::summarise(n = n_distinct(species))
 
-overall_mean_n_spp_taiaroa_east <- floor(mean(n_spp_taiaroa_east_season$n))
+overall_mean_n_spp_season <- floor(mean(n_spp_season$n))
 
 ## Total number of birds
-n_birds_taiaroa_east_season <-
+n_birds_season <-
   data %>% 
-  dplyr::group_by(id, taiaroa_east, season) %>% 
+  dplyr::filter(species %in% sp_only_cols) %>% 
+  dplyr::group_by(id, season) %>% 
   dplyr::summarise(n = sum(count)) %>% 
   dplyr::mutate(log10_n = log10(n))
 
-overall_log10mean_n_birds_taiaroa_east <- round(mean(n_birds_taiaroa_east_season$log10_n), 
+overall_log10mean_n_birds_season <- round(mean(n_birds_season$log10_n), 
                                                 digits = 2)
 
 ## Plot 1: species richness
 gg_n_spp_season <-
-  ggplot(data = n_spp_taiaroa_east_season, 
+  ggplot(data = n_spp_season, 
          aes(x = season, y = n, fill = season)) +
   geom_boxplot(width = 0.5) +
   scale_fill_manual(values = c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2"), 
                     name = NULL) +
-  geom_hline(yintercept = overall_mean_n_spp_taiaroa_east,
+  geom_hline(yintercept = overall_mean_n_spp_season,
              linetype = "longdash", colour = "grey50") +
   xlab("") + ylab("Number of species") +
   theme_bw() +
@@ -191,12 +198,12 @@ gg_n_spp_season <-
 
 ## Plot 2: number of birds
 gg_n_birds_season <-
-  ggplot(data = n_birds_taiaroa_east_season, 
+  ggplot(data = n_birds_season, 
          aes(x = season, y = log10_n, fill = season)) +
   geom_boxplot(width = 0.5) +
   scale_fill_manual(values = c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2"), 
                     name = NULL) +
-  geom_hline(yintercept = overall_log10mean_n_birds_taiaroa_east,
+  geom_hline(yintercept = overall_log10mean_n_birds_season,
              linetype = "longdash", colour = "grey50") +
   xlab("") + ylab("Total number of birds (log10)") +
   theme_bw() +
@@ -217,7 +224,26 @@ rm("gg_n_spp_season", "gg_n_birds_season", "gg_spprichness_nbirds_season")
 ## Summarise number of species and total number of birds, /5 km transect----####
 #------------------------------------------------------------------------------#
 
-## Note: using the same summarised objects from above
+
+## Species richness
+n_spp_taiaroa_east_season <-
+  data %>% 
+  dplyr::filter(species %in% sp_only_cols) %>% 
+  dplyr::group_by(id, taiaroa_east, season) %>% 
+  dplyr::summarise(n = n_distinct(species))
+
+overall_mean_n_spp_taiaroa_east <- floor(mean(n_spp_taiaroa_east_season$n))
+
+## Total number of birds
+n_birds_taiaroa_east_season <-
+  data %>% 
+  dplyr::filter(species %in% sp_only_cols) %>% 
+  dplyr::group_by(id, taiaroa_east, season) %>% 
+  dplyr::summarise(n = sum(count)) %>% 
+  dplyr::mutate(log10_n = log10(n))
+
+overall_log10mean_n_birds_taiaroa_east <- round(mean(n_birds_taiaroa_east_season$log10_n), 
+                                                digits = 2)
 
 ## Plot 1: species richness
 gg_n_spp_taiaroa_east_season <-
@@ -288,6 +314,60 @@ data_species_fo_nf <-
   # remove an extra underline
   dplyr::mutate(species = stringr::str_sub(species, end = -2))
 
+# Add nice names for the plot
+data_species_fo_nf <-
+  data_species_fo_nf %>% 
+  dplyr::mutate(species_nice_name = dplyr::case_when(
+    species == "black_backed_gull" ~ "Black-backed gull",
+    species == "red_billed_gull" ~ "Red-billed gull",
+    species == "white_capped_mollymawk" ~ "White-capped mollymawk",
+    species == "white_fronted_tern" ~ "White-fronted tern",
+    species == "sooty_shearwater" ~ "Sooty shearwater",
+    species == "cape_petrel" ~ "Cape petrel",
+    species == "southern_royal_albatross" ~ "Southern royal albatross",
+    species == "bullers_mollymawk" ~ "Buller's mollymawk",
+    species == "white_chinned_petrel" ~ "White-chinned petrel",
+    species == "bullers_shearwater" ~ "Buller's shearwater",
+    species == "hutton_fluttering_shearwater" ~ "Hutton's/Fluttering shearwater",
+    species == "northern_royal_albatross" ~ "Northern royal albatross",
+    species == "salvins_mollymawk" ~ "Salvin's mollymawk",
+    species == "black_browed_mollymawk" ~ "Black-browed mollymawk",
+    species == "fairy_prion" ~ "Fairy prion",
+    species == "black_bellied_storm_petrel" ~ "Black-bellied storm petrel",
+    species == "campbell_albatross" ~ "Campbell albatross",
+    species == "mottled_petrel" ~ "Mottled petrel",
+    species == "otago_shag" ~ "Otago shag",
+    species == "light_mantled_sooty_albatross" ~ "Light-mantled albatross",
+    species == "black_fronted_tern" ~ "Black-fronted tern",
+    species == "grey_petrel" ~ "Grey petrel",
+    species == "broad_billed_prion" ~ "Broad-billed prion",
+    species == "white_headed_petrel" ~ "White-headed petrel",
+    species == "spotted_shag" ~ "Spotted shag",
+    species == "chatham_mollymawk" ~ "Chatham mollymawk",
+    species == "wilsons_storm_petrel" ~ "Wilson's storm petrel",
+    species == "grey_backed_storm_petrel" ~ "Grey-backed storm petrel",
+    species == "southern_giant_petrel" ~ "Southern giant petrel",
+    species == "northern_giant_petrel" ~ "Northern giant petrel",
+    species == "grey_faced_petrel" ~ "Grey-faced petrel",
+    species == "soft_plumaged_petrel" ~ "Soft-plumaged petrel",
+    species == "white_faced_storm_petrel" ~ "White-faced storm petrel",
+    species == "wandering_albatross" ~ "Wandering albatross",
+    species == "westland_petrel" ~ "Westland petrel",
+    species == "australasian_gannet" ~ "Australasian gannet",
+    species == "diving_petrel" ~ "Diving petrel",
+    species == "black_shag" ~ "Black shag",
+    species == "black_billed_gull" ~ "Black-billed gull",
+    species == "antarctic_prion" ~ "Antarctic prion",
+    species == "cooks_petrel" ~ "Cook's petrel",
+    species == "black_winged_petrel" ~ "Black-winged petrel",
+    species == "antarctic_fulmar" ~ "Antarctic fulmar",
+    species == "brown_skua" ~ "Brown skua",
+    species == "yellow_eye_penguin" ~ "Yellow-eyed penguin",
+    species == "blue_penguin" ~ "Blue penguin",
+    species == "subantarctic_little_shearwater" ~ "Subantarctic little shearwater",
+    species == "south_polar_skua" ~ "South polar skua"
+  ))
+
 rm("funs")
 
 #### FO/NF plots
@@ -296,7 +376,7 @@ rm("funs")
 plot_freq_occ <-
   data_species_fo_nf %>% 
   dplyr::filter(freq == "freq_occ") %>% 
-  ggplot(., aes(x = forcats::fct_reorder(as.factor(species), value), 
+  ggplot(., aes(x = forcats::fct_reorder(as.factor(species_nice_name), value), 
                 y = value, 
                 fill = season)) + 
   geom_col() +
@@ -316,7 +396,7 @@ plot_freq_occ <-
 plot_freq_num <-
   data_species_fo_nf %>% 
   dplyr::filter(freq == "freq_num") %>% 
-  ggplot(., aes(x = forcats::fct_reorder(as.factor(species), value), 
+  ggplot(., aes(x = forcats::fct_reorder(as.factor(species_nice_name), value), 
                 y = value, 
                 fill = season)) + 
   geom_col() +
@@ -357,17 +437,26 @@ pct_watermass_taiaroa_east_season$taiaroa_east <-
                     "TaiaroaEast20.25km", "TaiaroaEast25.30km",
                     "TaiaroaEast30.35km", "TaiaroaEast35.40km",
                     "TaiaroaEast40.45km", "TaiaroaEast45.50km",
-                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"))
+                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"),
+         labels = c("0-5 km", "5-10 km", "10-15 km", "15-20 km",
+                    "20-25 km", "25-30 km", "30-35 km", "35-40 km",
+                    "40-45 km", "45-50 km", "50-55 km", "55-60 km"))
 
 pct_watermass_taiaroa_east_season$season <- 
   factor(pct_watermass_taiaroa_east_season$season,
-         levels = c("summer", "autumn", "winter", "spring"))
+         levels = c("summer", "autumn", "winter", "spring"),
+         labels = c("Summer", "Autumn", "Winter", "Spring"))
+
+pct_watermass_taiaroa_east_season$water_mass <- 
+  factor(pct_watermass_taiaroa_east_season$water_mass,
+         levels = c("NW", "STW", "SASW"),
+         labels = c("NW", "STW", "SASW"))
 
 gg_pct_watermass_taiaroa_east_season <-
   ggplot(data = na.omit(pct_watermass_taiaroa_east_season),
          aes(x = taiaroa_east, y = n, fill = water_mass)) + 
-  geom_bar(position = "fill", stat = "identity") + 
-  scale_fill_brewer(palette = "Accent", name = NULL) + 
+  geom_bar(position = "fill", stat = "identity", alpha = 0.8) + 
+  scale_fill_brewer(palette = "Dark2", name = NULL) + 
   facet_wrap(~ season, nrow = 4) + 
   xlab("") + ylab("% water mass") +
   theme_bw() + 
@@ -394,13 +483,15 @@ pct_windstress_season <-
   dplyr::summarise(n = n()) %>% 
   na.omit()
 
-pct_windstress_season$season <- 
-  factor(pct_windstress_season$season,
-         levels = c("summer", "autumn", "winter", "spring"))
+# pct_windstress_season$season <- 
+#   factor(pct_windstress_season$season,
+#          levels = c("summer", "autumn", "winter", "spring"),
+#          labels = c("Summer", "Autumn", "Winter", "Spring"))
 
 pct_windstress_season$windstress_class <- 
   factor(pct_windstress_season$windstress_class,
-         levels = c("strong_upfront", "weak_upfront", "weak_downfront", "strong_downfront"))
+         levels = c("strong_upfront", "weak_upfront", "weak_downfront", "strong_downfront"),
+         labels = c("Strong upfront", "Weak upfront", "Weak downfront", "Strong downfront"))
 
 ## Check colour palette
 # RColorBrewer::display.brewer.pal(12, "Paired")
