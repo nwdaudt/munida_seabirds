@@ -136,8 +136,9 @@ ts_data_summarised <-
 ## from the coast only. See the main text for references and rationale.
 
 ## Main refs: 
+## Jillett (1969) [NZ. J. Mar. Freshwater Res. 3: 349-375; "Identification of water mass boundaries", p. 360]
 ## Stevens et al. (2021) [NZ. J. Mar. Freshwater Res. 55: 6-45; Fig. 13]
-## Johnson et al. (202*) [Cont. Shelf Res. *in review*; Fig. 3]
+## Johnson et al. (2024) [Cont. Shelf Res. 277: 105248; Fig. 3]
 
 ## Criteria
 # Neritic Water (NW)                 == SSS < 34.6 & 'dist_coast' < 20km
