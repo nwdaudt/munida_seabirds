@@ -219,11 +219,11 @@ ggsave(gg_spprichness_nbirds_season,
        filename = "./results/EDA_spp-richness_n-birds_season.pdf",
        height = 10, width = 10, units = "cm")
 
-rm("gg_n_spp_season", "gg_n_birds_season", "gg_spprichness_nbirds_season")
+rm("gg_n_spp_season", "gg_n_birds_season", "gg_spprichness_nbirds_season",
+   "n_spp_season", "overall_mean_n_spp_season", "n_birds_season", "overall_log10mean_n_birds_season")
 
 ## Summarise number of species and total number of birds, /5 km transect----####
 #------------------------------------------------------------------------------#
-
 
 ## Species richness
 n_spp_taiaroa_east_season <-
@@ -419,7 +419,7 @@ ggsave(freqs_occ_num,
        filename = "./results/EDA_sp_frqs-occ-num.pdf",
        width = 16, height = 25, units = "cm", dpi = 300)
 
-rm("plot_freq_occ", "plot_freq_num", "freqs_occ_num")
+rm("plot_freq_occ", "plot_freq_num", "freqs_occ_num", "data_species_fo_nf")
 
 ## Summarise % of each water mass /5 km transect ---------------------------####
 #------------------------------------------------------------------------------#
@@ -471,7 +471,7 @@ ggsave(gg_pct_watermass_taiaroa_east_season,
        filename = "./results/EDA_pct_watermass_taiaroa_east_season.pdf",
        height = 15, width = 15, units = "cm")
 
-rm("pct_watermass_taiaroa_east_season", "gg_pct_watermass_taiaroa_east_season")
+rm("pct_watermass_taiaroa_east_season", "gg_pct_watermass_taiaroa_east_season", "wm_data")
 
 ## Summarise % of windstress class, by season ------------------------------####
 #------------------------------------------------------------------------------#
@@ -482,11 +482,6 @@ pct_windstress_season <-
   dplyr::group_by(season, windstress_class) %>%
   dplyr::summarise(n = n()) %>% 
   na.omit()
-
-# pct_windstress_season$season <- 
-#   factor(pct_windstress_season$season,
-#          levels = c("summer", "autumn", "winter", "spring"),
-#          labels = c("Summer", "Autumn", "Winter", "Spring"))
 
 pct_windstress_season$windstress_class <- 
   factor(pct_windstress_season$windstress_class,
@@ -514,3 +509,5 @@ gg_pct_windstress_season <-
 ggsave(gg_pct_windstress_season,
        filename = "./results/EDA_pct_windstress_season.pdf",
        height = 8, width = 11, units = "cm")
+
+rm("pct_windstress_season", "gg_pct_windstress_season")
