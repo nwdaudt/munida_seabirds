@@ -314,6 +314,51 @@ data_species_fo_nf <-
   # remove an extra underline
   dplyr::mutate(species = stringr::str_sub(species, end = -2))
 
+# ## Change values >500 to 500 -- needs a bit of a wrangle here
+# data_species_fo_nf_capped500 <-
+#   data_wide %>%
+#   # Remove 'total_birds'
+#   dplyr::select(- total_birds) %>%
+#   # Transform it to long format, so you are able to filter values >500
+#   tidyr::pivot_longer(cols = all_of(sp_only_cols),
+#                       names_to = "species",
+#                       values_to = "count") %>%
+# # head((data_species_fo_nf_capped500 %>% dplyr::arrange(desc(count))), n = 14)
+# #   id                season  year species           count
+# # 
+# # 1 munida_2015_03_10 Summer  2015 sooty_shearwater  20396
+# # 2 munida_2017_02_02 Summer  2017 sooty_shearwater  10027
+# # 3 munida_2015_11_05 Spring  2015 sooty_shearwater   5799
+# # 4 munida_2021_01_27 Summer  2021 red_billed_gull    3601
+# # 5 munida_2017_03_27 Summer  2017 sooty_shearwater   2497
+# # 6 munida_2021_11_30 Spring  2021 red_billed_gull    1706
+# # 7 munida_2022_06_08 Autumn  2022 red_billed_gull    1400
+# # 8 munida_2020_10_13 Spring  2020 sooty_shearwater   1220
+# # 9 munida_2021_05_27 Autumn  2021 black_billed_gull  1100
+# # 10 munida_2019_11_04 Spring  2019 red_billed_gull    1033
+# # 11 munida_2023_01_24 Summer  2023 black_backed_gull  1006
+# # 12 munida_2017_03_27 Summer  2017 red_billed_gull     968
+# # 13 munida_2021_05_27 Autumn  2021 red_billed_gull     601
+# # 14 munida_2015_11_05 Spring  2015 red_billed_gull     509
+#   dplyr::mutate(count = ifelse(count > 500, yes = 500, no = count)) %>%
+#   # Back to wide format
+#   tidyr::pivot_wider(id_cols = c(id, season, year),
+#                      names_from = "species",
+#                      values_from = "count") %>% 
+#   dplyr::mutate(total_birds = rowSums(across(all_of(sp_only_cols)))) %>% 
+#   dplyr::group_by(season) %>%
+#   dplyr::summarise(across(all_of(sp_only_cols), .fns = funs)) %>%
+#   tidyr::pivot_longer(cols = !season,
+#                       names_to = "species_freq",
+#                       values_to = "value") %>%
+#   dplyr::mutate(value = round(value, digits = 2)) %>%
+#   # split name into variables
+#   tidyr::separate(species_freq,
+#                   into = c("species", "freq"),
+#                   sep = -8) %>%
+#   # remove an extra underline
+#   dplyr::mutate(species = stringr::str_sub(species, end = -2))
+
 # Add nice names for the plot
 data_species_fo_nf <-
   data_species_fo_nf %>% 
@@ -368,6 +413,59 @@ data_species_fo_nf <-
     species == "south_polar_skua" ~ "South polar skua"
   ))
 
+# data_species_fo_nf_capped500 <-
+#   data_species_fo_nf_capped500 %>% 
+#   dplyr::mutate(species_nice_name = dplyr::case_when(
+#     species == "black_backed_gull" ~ "Black-backed gull",
+#     species == "red_billed_gull" ~ "Red-billed gull",
+#     species == "white_capped_mollymawk" ~ "White-capped mollymawk",
+#     species == "white_fronted_tern" ~ "White-fronted tern",
+#     species == "sooty_shearwater" ~ "Sooty shearwater",
+#     species == "cape_petrel" ~ "Cape petrel",
+#     species == "southern_royal_albatross" ~ "Southern royal albatross",
+#     species == "bullers_mollymawk" ~ "Buller's mollymawk",
+#     species == "white_chinned_petrel" ~ "White-chinned petrel",
+#     species == "bullers_shearwater" ~ "Buller's shearwater",
+#     species == "hutton_fluttering_shearwater" ~ "Hutton's/Fluttering shearwater",
+#     species == "northern_royal_albatross" ~ "Northern royal albatross",
+#     species == "salvins_mollymawk" ~ "Salvin's mollymawk",
+#     species == "black_browed_mollymawk" ~ "Black-browed mollymawk",
+#     species == "fairy_prion" ~ "Fairy prion",
+#     species == "black_bellied_storm_petrel" ~ "Black-bellied storm petrel",
+#     species == "campbell_albatross" ~ "Campbell albatross",
+#     species == "mottled_petrel" ~ "Mottled petrel",
+#     species == "otago_shag" ~ "Otago shag",
+#     species == "light_mantled_sooty_albatross" ~ "Light-mantled albatross",
+#     species == "black_fronted_tern" ~ "Black-fronted tern",
+#     species == "grey_petrel" ~ "Grey petrel",
+#     species == "broad_billed_prion" ~ "Broad-billed prion",
+#     species == "white_headed_petrel" ~ "White-headed petrel",
+#     species == "spotted_shag" ~ "Spotted shag",
+#     species == "chatham_mollymawk" ~ "Chatham mollymawk",
+#     species == "wilsons_storm_petrel" ~ "Wilson's storm petrel",
+#     species == "grey_backed_storm_petrel" ~ "Grey-backed storm petrel",
+#     species == "southern_giant_petrel" ~ "Southern giant petrel",
+#     species == "northern_giant_petrel" ~ "Northern giant petrel",
+#     species == "grey_faced_petrel" ~ "Grey-faced petrel",
+#     species == "soft_plumaged_petrel" ~ "Soft-plumaged petrel",
+#     species == "white_faced_storm_petrel" ~ "White-faced storm petrel",
+#     species == "wandering_albatross" ~ "Wandering albatross",
+#     species == "westland_petrel" ~ "Westland petrel",
+#     species == "australasian_gannet" ~ "Australasian gannet",
+#     species == "diving_petrel" ~ "Diving petrel",
+#     species == "black_shag" ~ "Black shag",
+#     species == "black_billed_gull" ~ "Black-billed gull",
+#     species == "antarctic_prion" ~ "Antarctic prion",
+#     species == "cooks_petrel" ~ "Cook's petrel",
+#     species == "black_winged_petrel" ~ "Black-winged petrel",
+#     species == "antarctic_fulmar" ~ "Antarctic fulmar",
+#     species == "brown_skua" ~ "Brown skua",
+#     species == "yellow_eye_penguin" ~ "Yellow-eyed penguin",
+#     species == "blue_penguin" ~ "Blue penguin",
+#     species == "subantarctic_little_shearwater" ~ "Subantarctic little shearwater",
+#     species == "south_polar_skua" ~ "South polar skua"
+#   ))
+
 rm("funs")
 
 #### FO/NF plots
@@ -392,7 +490,7 @@ plot_freq_occ <-
         axis.title.x = element_text(size = 8),
         strip.text = element_text(size = 8))
 
-## Relative abundance (numeric frequency)
+## Relative abundance (numeric frequency -- total)
 plot_freq_num <-
   data_species_fo_nf %>% 
   dplyr::filter(freq == "freq_num") %>% 
@@ -410,6 +508,29 @@ plot_freq_num <-
         axis.text.y = element_text(size = 6, colour = "black"),
         axis.title.x = element_text(size = 8),
         strip.text = element_text(size = 8))
+
+# ## Relative abundance (numeric frequency -- CAPPED AT 500)
+# plot_freq_num_capped500 <-
+#   data_species_fo_nf_capped500 %>% 
+#   dplyr::filter(freq == "freq_num") %>% 
+#   ggplot(., aes(x = forcats::fct_reorder(as.factor(species_nice_name), value), 
+#                 y = value, 
+#                 fill = season)) + 
+#   geom_col() +
+#   scale_fill_manual(values = c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2")) +
+#   facet_grid(~ season) +
+#   ylab("Relative abundance (%)") + xlab ("") +
+#   coord_flip() +
+#   theme_bw() + 
+#   theme(legend.position = "none",
+#         axis.text = element_text(size = 7, colour = "black"),
+#         axis.text.y = element_text(size = 6, colour = "black"),
+#         axis.title.x = element_text(size = 8),
+#         strip.text = element_text(size = 8))
+# 
+# ggsave(plot_freq_num_capped500,
+#        filename = "./results/EDA_sp_frq-num-capped-at-500.pdf",
+#        width = 16, height = 13, units = "cm", dpi = 300)
 
 ## Patchwork these plots and save it
 freqs_occ_num <-
