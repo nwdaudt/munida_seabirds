@@ -397,7 +397,7 @@ ebird_data <-
 
 rm("aux_table")
 
-## Merge both 'digitised' and 'ebird' datasets, & save it ####
+## Merge both 'digitised' and 'ebird' datasets, add nice English species names (no 'underscore') & save it ####
 
 all_data_long <- 
   # Merge both datasets
@@ -419,5 +419,70 @@ all_data_long <-
   dplyr::mutate(count = tidyr::replace_na(as.numeric(count), 0)) %>% 
   dplyr::filter(! count == 0)
 
+## Add English names without the underscore to ease the process when plotting the data
+all_data_long <- 
+  all_data_long %>% 
+  dplyr::mutate(species_nice_name = dplyr::case_when(
+    species == "black_backed_gull" ~ "Black-backed gull",
+    species == "red_billed_gull" ~ "Red-billed gull",
+    species == "white_capped_mollymawk" ~ "White-capped mollymawk",
+    species == "white_fronted_tern" ~ "White-fronted tern",
+    species == "sooty_shearwater" ~ "Sooty shearwater",
+    species == "cape_petrel" ~ "Cape petrel",
+    species == "southern_royal_albatross" ~ "Southern royal albatross",
+    species == "bullers_mollymawk" ~ "Buller's mollymawk",
+    species == "white_chinned_petrel" ~ "White-chinned petrel",
+    species == "bullers_shearwater" ~ "Buller's shearwater",
+    species == "hutton_fluttering_shearwater" ~ "Hutton's/Fluttering shearwater",
+    species == "northern_royal_albatross" ~ "Northern royal albatross",
+    species == "salvins_mollymawk" ~ "Salvin's mollymawk",
+    species == "black_browed_mollymawk" ~ "Black-browed mollymawk",
+    species == "fairy_prion" ~ "Fairy prion",
+    species == "black_bellied_storm_petrel" ~ "Black-bellied storm petrel",
+    species == "campbell_albatross" ~ "Campbell albatross",
+    species == "mottled_petrel" ~ "Mottled petrel",
+    species == "otago_shag" ~ "Otago shag",
+    species == "light_mantled_sooty_albatross" ~ "Light-mantled albatross",
+    species == "black_fronted_tern" ~ "Black-fronted tern",
+    species == "grey_petrel" ~ "Grey petrel",
+    species == "broad_billed_prion" ~ "Broad-billed prion",
+    species == "white_headed_petrel" ~ "White-headed petrel",
+    species == "spotted_shag" ~ "Spotted shag",
+    species == "chatham_mollymawk" ~ "Chatham mollymawk",
+    species == "wilsons_storm_petrel" ~ "Wilson's storm petrel",
+    species == "grey_backed_storm_petrel" ~ "Grey-backed storm petrel",
+    species == "southern_giant_petrel" ~ "Southern giant petrel",
+    species == "northern_giant_petrel" ~ "Northern giant petrel",
+    species == "grey_faced_petrel" ~ "Grey-faced petrel",
+    species == "soft_plumaged_petrel" ~ "Soft-plumaged petrel",
+    species == "white_faced_storm_petrel" ~ "White-faced storm petrel",
+    species == "wandering_albatross" ~ "Wandering albatross",
+    species == "westland_petrel" ~ "Westland petrel",
+    species == "australasian_gannet" ~ "Australasian gannet",
+    species == "diving_petrel" ~ "Diving petrel",
+    species == "black_shag" ~ "Black shag",
+    species == "black_billed_gull" ~ "Black-billed gull",
+    species == "antarctic_prion" ~ "Antarctic prion",
+    species == "cooks_petrel" ~ "Cook's petrel",
+    species == "black_winged_petrel" ~ "Black-winged petrel",
+    species == "antarctic_fulmar" ~ "Antarctic fulmar",
+    species == "brown_skua" ~ "Brown skua",
+    species == "yellow_eye_penguin" ~ "Yellow-eyed penguin",
+    species == "blue_penguin" ~ "Blue penguin",
+    species == "subantarctic_little_shearwater" ~ "Subantarctic little shearwater",
+    species == "south_polar_skua" ~ "South polar skua",
+    species == "unknown_petrel" ~ "Unknown petrel",
+    species == "unknown_stercorarius_skua" ~ "Unknown (Stercorarius) skua",
+    species == "unknown_tern" ~ "Unknown tern", 
+    species == "unknown_storm_petrel" ~ "Unknown storm petrel",
+    species == "unknown_giant_petrel" ~ "Unknown giant petrel", 
+    species == "unknown_shearwater" ~ "Unknown shearwater", 
+    species == "unknown_prion" ~ "Unknown prion", 
+    species == "unknown_gadfly" ~ "Unknown gadfly",
+    species == "unknown_albatross" ~ "Unknown albatross",
+    species == "unknown_mollymawk" ~ "Unknown mollymawk"
+  ), .after = species)
+
 write.csv(all_data_long,
-          file = "./data-processed/seabird_data_long.csv")
+          file = "./data-processed/seabird_data_long.csv",
+          row.names = FALSE)

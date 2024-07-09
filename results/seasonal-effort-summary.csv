@@ -1,5 +1,5 @@
-"","season","number_of_voyages","number_of_years_sampled","number_of_species","number_of_individuals"
-"1","summer",14,9,40,46149
-"2","autumn",7,7,37,5604
-"3","winter",10,7,33,4209
-"4","spring",5,5,35,13063
+"season","number_of_voyages","number_of_years_sampled","number_of_species","number_of_individuals"
+"Summer",14,9,39,46148
+"Autumn",7,7,37,5604
+"Winter",10,7,33,4209
+"Spring",5,5,35,13063

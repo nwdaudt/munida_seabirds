@@ -4,7 +4,8 @@
 ## -------------------------------------------------------------------------- ##
 ## -------------------------------------------------------------------------- ##
 
-## This script runs Bernoulli models for each species
+## This script runs multivariate GLM models to test if ENSO affected seabird numbers
+## It also summarises some numbers regarding the ENSO phases
 
 ## -------------------------------------------------------------------------- ##
 ## -------------------------------------------------------------------------- ##
@@ -271,5 +272,12 @@ anova(mvGLM_ENSO)
 # P-value calculated using 999 iterations via PIT-trap resampling.
 
 mvGLM_anova_puni <- anova(mvGLM_ENSO, p.uni = "adjusted")
-# View(t(mvGLM_anova_puni[["uni.test"]]))
+# Treatment (ENSO) effect on mean abundance 
+mvGLM_anova_puni[["table"]]
+# Species-specific tests
+View(
+  cbind(
+    Dev = t(mvGLM_anova_puni[["uni.test"]])[,2], 
+    p_value = t(mvGLM_anova_puni[["uni.p"]])[,2]
+    ))
 # anova(mvGLM_ENSO, p.uni = "adjusted") # straight like this it returns Dev and Pr(>Dev)

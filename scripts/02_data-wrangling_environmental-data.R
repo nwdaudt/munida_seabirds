@@ -162,11 +162,12 @@ ts_data_summarised <-
 rm("strg_taiaroa_east_0to20km")
 
 write.csv(ts_data_summarised, 
-          file = "./data-processed/ts_data_summarised_watermasses.csv")
+          file = "./data-processed/ts_data_summarised_watermasses.csv",
+          row.names = FALSE)
 
 ## ---------------------------------------------------------------------------- #
 ## Below, a code that classifies water masses based on both, T and S. --------- #
-## Note -- it doesn't work properly... ---------------------------------------- #
+## NOTE -- it doesn't work properly... ---------------------------------------- #
 ## ---------------------------------------------------------------------------- #
 #
 # # Assuming a linear transition between Summer/Winter seasons,
@@ -288,25 +289,8 @@ windstress_df <-
   ))
 
 write.csv(windstress_df, 
-          file = "./data-processed/windstress_data_summarised.csv")
-
-## ------------------------------------------------------------------------------ #
-## Instead of using quantiles (below), we used Johnson et al. (2023) threshold -- #
-## (see code above) ------------------------------------------------------------- #
-## ------------------------------------------------------------------------------ #
-# qntls <- quantile(windstress_data$windstress, na.rm = T,
-#                   probs = c(0, 0.3, 0.5, 0.7, 1))
-# 
-# windstress_df <-
-#   windstress_df %>% 
-#   dplyr::mutate(windstress_class = dplyr::case_when(
-#     avg_windstress > qntls[1] & avg_windstress <= qntls[2] ~ "strong_upfront",
-#     avg_windstress > qntls[2] & avg_windstress <= qntls[3] ~ "weak_upfront",
-#     avg_windstress > qntls[3] & avg_windstress <= qntls[4] ~ "weak_downfront",
-#     avg_windstress > qntls[4] & avg_windstress <= qntls[5] ~ "strong_downfront"
-#   ))
-## ------------------------------------------------------------------------------ #
-## ------------------------------------------------------------------------------ #
+          file = "./data-processed/windstress_data_summarised.csv",
+          row.names = FALSE)
 
 ## Merge TS and Windstress data with 'seabird_data_long', and save it ####
 
@@ -323,9 +307,8 @@ all_data_long <-
                    by = c("date", "taiaroa_east")) %>% 
   # Better nomenclature to 'direction'
   dplyr::mutate(direction = ifelse(direction == "out",
-                                   yes = "eastward",
-                                   no = "westward")) %>% 
-  dplyr::select(-X)
+                                   yes = "outbound",
+                                   no = "inbound"))
 
 ## Before saving it, check if there are any duplicates on the data
 tmp <- 
@@ -345,4 +328,5 @@ rm("tmp")
 
 ## Save it
 write.csv(all_data_long,
-          file = "./data-processed/all_data_long.csv")
+          file = "./data-processed/all_data_long.csv",
+          row.names = FALSE)
