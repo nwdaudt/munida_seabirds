@@ -369,6 +369,10 @@ rm("plot_freq_occ", "plot_freq_num", "freqs_occ_num", "data_species_fo_nf")
 ## Frequency of occurrence and numeric frequency, by year ----------------####
 #------------------------------------------------------------------------------#
 
+# # Specify functions to calculate frequency of occurrence (freq_occ) and numeric frequency (freq_num)
+# funs <- list(freq_occ = ~ sum(.x >= 1)/n() *100,
+#              freq_num = ~ sum(.x)/sum(dplyr::pick(total_birds)) *100)
+
 data_species_fo_nf_year <-
   data_wide %>% 
   dplyr::group_by(year) %>%
@@ -408,34 +412,37 @@ plot_freq_occ_year <-
         axis.title.x = element_text(size = 8),
         strip.text = element_text(size = 8))
 
-## Relative abundance (numeric frequency -- total)
-plot_freq_num_year <-
-  data_species_fo_nf_year %>% 
-  dplyr::filter(freq == "freq_num") %>% 
-  ggplot(., aes(x = forcats::fct_reorder(as.factor(species_nice_name), value), 
-                y = value, 
-                fill = as.factor(year))) + 
-  geom_col(color = "gray58") +
-  scale_fill_brewer(palette = "Reds", name = NULL) +
-  facet_grid(~ year) +
-  ylab("Relative abundance (%)") + xlab ("") +
-  coord_flip() +
-  theme_bw() + 
-  theme(legend.position = "none",
-        axis.text = element_text(size = 7, colour = "black"),
-        axis.text.y = element_text(size = 6, colour = "black"),
-        axis.title.x = element_text(size = 8),
-        strip.text = element_text(size = 8))
+# ## Relative abundance (numeric frequency -- total) 
+# ## -->> Too variable, thus do not contribute much to understanding any patterns (so, I didn't save it)
+# plot_freq_num_year <-
+#   data_species_fo_nf_year %>% 
+#   dplyr::filter(freq == "freq_num") %>% 
+#   ggplot(., aes(x = forcats::fct_reorder(as.factor(species), value), 
+#                 y = value, 
+#                 fill = as.factor(year))) + 
+#   geom_col(color = "gray58") +
+#   scale_fill_brewer(palette = "Reds", name = NULL) +
+#   facet_grid(~ year) +
+#   ylab("Relative abundance (%)") + xlab ("") +
+#   coord_flip() +
+#   theme_bw() + 
+#   theme(legend.position = "none",
+#         axis.text = element_text(size = 7, colour = "black"),
+#         axis.text.y = element_text(size = 6, colour = "black"),
+#         axis.title.x = element_text(size = 8),
+#         strip.text = element_text(size = 8))
+# 
+# ## Patchwork these plots and save it
+# freqs_occ_num_year <-
+#   plot_freq_occ_year / plot_freq_num_year
 
-## Patchwork these plots and save it
-freqs_occ_num_year <-
-  plot_freq_occ_year / plot_freq_num_year
+ggsave(plot_freq_occ_year,
+       filename = "./results/EDA_sp_frqs-occ-year.pdf",
+       width = 22, height = 16, units = "cm", dpi = 300)
 
-ggsave(freqs_occ_num_year,
-       filename = "./results/EDA_sp_frqs-occ-num-year.pdf",
-       width = 30, height = 25, units = "cm", dpi = 300)
-
-rm("plot_freq_occ_year", "plot_freq_num_year", "freqs_occ_num_year", "data_species_fo_nf_year")
+rm("plot_freq_occ_year", "data_species_fo_nf_year"
+   # , "plot_freq_num_year", "freqs_occ_num_year"
+   )
 
 ## Summarise % of each water mass /5 km segment ---------------------------####
 #------------------------------------------------------------------------------#
