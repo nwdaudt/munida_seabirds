@@ -14,11 +14,12 @@
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(patchwork)
 library(mvabund)
 
 ## Read data ####
 data <- 
-  read.csv("./data-processed/all_data_long.csv")[, -1] %>% 
+  read.csv("./data-processed/all_data_long.csv") %>% 
   dplyr::filter(! year == "2012")
 
 ## Format some columns
@@ -33,7 +34,7 @@ data$taiaroa_east <-
 
 data$direction <- 
   factor(data$direction,
-         levels = c("eastward", "westward"))
+         levels = c("outbound", "inbound"))
 
 data$season <- 
   factor(data$season,
@@ -49,7 +50,7 @@ data_wide <-
                      values_fill = 0)
 
 # Get spp and sp-only column names
-spp_cols <- colnames(data_wide[,c(17:74)]) ## All seabirds
+spp_cols <- colnames(data_wide[,c(18:74)]) ## All seabirds
 sp_only_cols <- spp_cols[! grepl(pattern = "unknown", x = spp_cols)] ## Only species-level
 
 # Calculate total number of birds per sample (total_birds)
@@ -63,27 +64,63 @@ data_wide <-
 colnames(data_wide) <- c("id", "season", "year", sp_only_cols, "total_birds")
 
 ## ENSO data ----------------------------------------------------------------- #
-soi_phases_since_1880s <- 
-  read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv")
 
-soi_phases <- 
-  read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv") %>% 
-  dplyr::filter(year >= 2015) %>% 
-  dplyr::mutate(month_number = match(month, month.abb)) %>% 
-  dplyr::select(year, month_number, soi_phase)
+## NOAA NCEI data 
+# Source: https://www.ncei.noaa.gov/access/monitoring/enso/soi 
+# Accessed on the 17 Jul 2024
+noaa_soi <- read.table("./data-raw/NOAA-NCEI_SOI.txt")
+noaa_soi <- noaa_soi[2:(nrow(noaa_soi)-1),] ## "-1" as we won't need 2024
+# Fix column names
+col_names_soi <- c("year", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+colnames(noaa_soi) <- col_names_soi
+# Fix Year data-type
+noaa_soi$year <- as.numeric(noaa_soi$year)
 
-# Merge seabird (way back) and ENSO data
-data_soi <- 
-  dplyr::left_join(data[data$direction == "westward", ],
-                   soi_phases,
+noaa_soi_long <- 
+  noaa_soi %>% 
+  tidyr::pivot_longer(cols = col_names_soi[-1],
+                      names_to = "month",
+                      values_to = "soi") %>% 
+  # Get months as 'numeric' to merge with seabird data
+  dplyr::mutate(month_number = match(month, month.abb), .after = month) %>% 
+  # Fix SOI data-type to numeric 
+  dplyr::mutate(soi = as.numeric(soi)) %>% 
+  # Specify the SOI phase based on its value
+  dplyr::mutate(soi_phase = dplyr::case_when(
+    soi >= 1 ~ "La Niña",
+    soi <= -1 ~ "El Niño",
+    .default = "Neutral"
+  ))
+
+# Merge seabird (inbound) and SOI data
+data_soi <-
+  dplyr::left_join(data[data$direction == "inbound", ],
+                   noaa_soi_long,
                    by = join_by(year == year, month == month_number))
+
+## NIWA (until 2022)
+# soi_phases_since_1880s <- 
+#   read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv")
+# 
+# soi_phases <- 
+#   read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv") %>% 
+#   dplyr::filter(year >= 2015) %>% 
+#   dplyr::mutate(month_number = match(month, month.abb)) %>% 
+#   dplyr::select(year, month_number, soi_phase)
+# 
+# # Merge seabird (inbound) and ENSO data
+# data_soi <- 
+#   dplyr::left_join(data[data$direction == "inbound", ],
+#                    soi_phases,
+#                    by = join_by(year == year, month == month_number))
 
 ## ENSO phases % along the sampled years -----------------------------------####
 #------------------------------------------------------------------------------#
 soi_phases_summary_year <-
-  soi_phases %>% 
+  noaa_soi_long %>% 
   dplyr::group_by(year, soi_phase) %>% 
-  dplyr::summarise(count = n())
+  dplyr::summarise(count = n()) %>% 
+  dplyr::filter(year > 2014)
 
 ## Stacked barplot
 plot_stacked_hist_ENSO_year <-
@@ -102,11 +139,9 @@ plot_stacked_hist_ENSO_year <-
         axis.title.y = element_text(size = 9),
         legend.text = element_text(size = 9))
 
-ggsave(plot_stacked_hist_ENSO_year,
-       filename = "./results/ENSO_stacked-barplot_per-year.pdf",
-       height = 8, width = 10, units = "cm", dpi = 300)
-
-rm("soi_phases_summary_year", "plot_stacked_hist_ENSO_year")
+# ggsave(plot_stacked_hist_ENSO_year,
+#        filename = "./results/ENSO_stacked-barplot_per-year.pdf",
+#        height = 8, width = 10, units = "cm", dpi = 300)
 
 ## Number of voyages in each ENSO phase ------------------------------------####
 #------------------------------------------------------------------------------#
@@ -114,8 +149,6 @@ SOI_summary_voyage <-
   data_soi %>% 
   dplyr::select(id, soi_phase) %>% 
   dplyr::distinct(id, soi_phase) %>% 
-  # 2023 data do not exist currently, remove NAs
-  dplyr::filter(! is.na(soi_phase)) %>% 
   dplyr::group_by(soi_phase) %>% 
   dplyr::summarise(count = n())
   
@@ -135,11 +168,25 @@ plot_barplot_voyages_per_ENSO_phase <-
         axis.title.y = element_text(size = 9),
         legend.position = "none")
 
-ggsave(plot_barplot_voyages_per_ENSO_phase,
-       filename = "./results/ENSO_barplot_number-of-voyages-per-phase.pdf",
-       height = 8, width = 8, units = "cm", dpi = 300)
+# ggsave(plot_barplot_voyages_per_ENSO_phase,
+#        filename = "./results/ENSO_barplot_number-of-voyages-per-phase.pdf",
+#        height = 8, width = 8, units = "cm", dpi = 300)
 
-rm("SOI_summary_voyage", "plot_barplot_voyages_per_ENSO_phase")
+## {patchwork} the above two plots -----------------------------------------####
+#------------------------------------------------------------------------------#
+
+ENSO_summary <- 
+  plot_stacked_hist_ENSO_year / plot_barplot_voyages_per_ENSO_phase +
+  patchwork::plot_annotation(tag_levels = 'A')
+
+ggsave(ENSO_summary,
+       filename = "./results/ENSO_summary_bar-and-stack-plots.pdf",
+       height = 14, width = 12, units = "cm", dpi = 300)
+
+
+rm("soi_phases_summary_year", "plot_stacked_hist_ENSO_year",
+   "SOI_summary_voyage", "plot_barplot_voyages_per_ENSO_phase",
+   "ENSO_summary")
 
 ## Species counts related to SOI phases ------------------------------------####
 #------------------------------------------------------------------------------#
@@ -149,8 +196,6 @@ data_soi_plot <-
   dplyr::group_by(id, species, soi_phase) %>% 
   dplyr::summarise(count_id = sum(count)) %>% 
   dplyr::ungroup() %>% 
-  # 2023 SOI data still not released, which returned NA above - so filter them away
-  dplyr::filter(! is.na(soi_phase)) %>% 
   # Keep only species identified to the species level
   dplyr::filter(species %in% sp_only_cols) %>% 
   # Select columns for plot
