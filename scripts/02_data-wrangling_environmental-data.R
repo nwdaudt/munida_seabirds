@@ -51,6 +51,20 @@ ts_data <-
 # Check
 # unique(ts_data$date) # --- OK
 
+#-------------------------------------------------------------#
+### TS data is missing "2012-09-04" (which is fine, as we won't use this voyage), and "2022-06-08"
+### In addition, three dates are missing salinity data, see below
+# tmp <-
+#   ts_data %>% 
+#   dplyr::filter(is.na(salinity_psu))
+# 
+# unique(tmp$date)
+# "2017-03-27" "2021-07-28" "2021-11-30"
+#
+### That means we won't have 'water_mass' information for four voyages,
+### which will be excluded in the analyses
+#-------------------------------------------------------------#
+
 ## Specify in which 5-km transect each value (row) is on
 ts_data <- 
   ts_data %>% 
