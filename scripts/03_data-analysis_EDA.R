@@ -100,6 +100,74 @@ effort_summary <-
 
 rm("effort_summary")
 
+## Number of occurrence, by species ####
+
+## Total number of 5-km segments
+n_segments_total <- nrow(unique(data.frame(data$id, 
+                                           data$taiaroa_east, 
+                                           data$direction)))
+
+## Number of 5-km inbound segments
+n_segments_inboud <- 
+  nrow(unique(data.frame(data[data$direction=="inbound",]$id, 
+                         data[data$direction=="inbound",]$taiaroa_east, 
+                         data[data$direction=="inbound",]$direction)))
+
+### (ALL DATA) 
+## Long to wide format: [ "wide_data" object]
+data_wide_all <- 
+  data %>% 
+  # Need to delete this column otherwise it messes up with the 'pivot_wide' results
+  dplyr::select(- species) %>% 
+  tidyr::pivot_wider(names_from = species_nice_name,
+                     values_from = count,
+                     values_fill = 0)
+n_occ_ALL <- 
+  # Get species names and number of occurrences
+  data.frame(
+    species = sp_only_cols,
+    n_occ = apply(data_wide_all[sp_only_cols], MARGIN = 2, function(x) sum(x >= 1)),
+    row.names = NULL)
+
+### (INBOUND DATA) 
+## Transform the data from long to wide format
+data_wide_inbound <- 
+  data %>% 
+  # Need to delete this column otherwise it messes up with the 'pivot_wide' results
+  dplyr::select(- species) %>% 
+  tidyr::pivot_wider(names_from = species_nice_name,
+                     values_from = count,
+                     values_fill = 0) %>% 
+  ## Filter only the way back ("inbound")
+  dplyr::filter(direction == "inbound") 
+
+n_occ_INBOUND <- 
+  # Get species names and number of occurrences
+  data.frame(
+    species = sp_only_cols,
+    n_occ = apply(data_wide_inbound[sp_only_cols], MARGIN = 2, function(x) sum(x >= 1)),
+    row.names = NULL)
+
+n_occ_summary <- data.frame(
+  species = n_occ_ALL$species,
+  # Both directions
+  n_segments_total = n_segments_total,
+  n_segments_total_occ = n_occ_ALL$n_occ,
+  fo_segments_total = round(((n_occ_ALL$n_occ/n_segments_total) *100), digits = 1),
+  # Inbound
+  n_segments_inboud = n_segments_inboud,
+  n_segments_inbound_occ = n_occ_INBOUND$n_occ,
+  fo_segments_inbound = round(((n_occ_INBOUND$n_occ/n_segments_inboud) *100), digits = 1)
+)
+
+# write.csv(n_occ_summary,
+#           "./results/species-occurrence-fo-summary.csv",
+#           row.names = FALSE)
+
+rm("data_wide_all", "data_wide_inbound",
+   "n_occ_ALL", "n_occ_INBOUND",
+   "n_segments_total", "n_segments_inboud")
+
 ## Summarise number of samples, by direction /5 km segment ----------------####
 #------------------------------------------------------------------------------#
 n_sample_taiaroa_east <-
@@ -206,7 +274,7 @@ gg_n_birds_season <-
                     name = NULL) +
   geom_hline(yintercept = overall_log10mean_n_birds_season,
              linetype = "longdash", colour = "grey50") +
-  xlab("") + ylab("Total number of birds (log10)") +
+  xlab("") + ylab("Total number of birds\n(log10)") +
   theme_bw() +
   theme(axis.text.x = element_blank(),
         axis.text = element_text(size = 10, colour = "black"),
@@ -214,7 +282,9 @@ gg_n_birds_season <-
         axis.line = element_line(colour = "black"),
         legend.position = "top")
 
-gg_spprichness_nbirds_season <- gg_n_spp_season / gg_n_birds_season
+gg_spprichness_nbirds_season <- 
+  gg_n_spp_season / gg_n_birds_season +
+  patchwork::plot_annotation(tag_levels = "A")
 
 ggsave(gg_spprichness_nbirds_season,
        filename = "./results/EDA_spp-richness_n-birds_season.pdf",
@@ -273,7 +343,7 @@ gg_n_birds_taiaroa_east_season <-
                     name = NULL) +
   geom_hline(yintercept = overall_log10mean_n_birds_taiaroa_east,
              linetype = "longdash", colour = "grey50") +
-  xlab("") + ylab("Total number of birds (log10)") +
+  xlab("") + ylab("Total number of birds\n(log10)") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.text = element_text(size = 10, colour = "black"),
@@ -283,7 +353,8 @@ gg_n_birds_taiaroa_east_season <-
         legend.background = element_rect(colour = "black"))
 
 gg_spprichness_nbirds_taiaroa_east <- 
-  gg_n_spp_taiaroa_east_season / gg_n_birds_taiaroa_east_season
+  gg_n_spp_taiaroa_east_season / gg_n_birds_taiaroa_east_season +
+  patchwork::plot_annotation(tag_levels = "A")
 
 ggsave(gg_spprichness_nbirds_taiaroa_east,
        filename = "./results/EDA_spp-richness_n-birds_taiaroa-east.pdf",
@@ -358,7 +429,8 @@ plot_freq_num <-
 
 ## Patchwork these plots and save it
 freqs_occ_num <-
-  plot_freq_occ / plot_freq_num
+  plot_freq_occ / plot_freq_num +
+  patchwork::plot_annotation(tag_levels = "A")
 
 ggsave(freqs_occ_num,
        filename = "./results/EDA_sp_frqs-occ-num-season.pdf",

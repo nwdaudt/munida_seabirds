@@ -102,18 +102,18 @@ long_data_pa <-
   dplyr::mutate(species_nice_name = dplyr::case_when(
     species == "black_backed_gull" ~ "Black-backed gull [(S)]",
     species == "red_billed_gull" ~ "Red-billed gull [(S)]",
-    species == "white_capped_mollymawk" ~ "White-capped mollymawk [M - SA, SO]",
+    species == "white_capped_mollymawk" ~ "White-capped albatross [M - SA, SO]",
     species == "white_fronted_tern" ~ "White-fronted tern [(S)]",
     species == "sooty_shearwater" ~ "Sooty shearwater [M - NP, EP]",
     species == "cape_petrel" ~ "Cape petrel [D - SWP, SO]",
     species == "southern_royal_albatross" ~ "Southern royal albatross [M - SA, SO]",
-    species == "bullers_mollymawk" ~ "Buller's mollymawk [M - EP]",
+    species == "bullers_mollymawk" ~ "Buller's albatross [M - EP]",
     species == "white_chinned_petrel" ~ "White-chinned petrel [D - SO]",
     species == "bullers_shearwater" ~ "Buller's shearwater [M - NP, EP]",
     species == "hutton_fluttering_shearwater" ~ "Hutton's/Fluttering shearwater [M - TS/A]",
     species == "northern_royal_albatross" ~ "Northern royal albatross [M - SA, SO]",
-    species == "salvins_mollymawk" ~ "Salvin's mollymawk [M - EP, SA, SO]",
-    species == "black_browed_mollymawk" ~ "Black-browed mollymawk [D - SO]",
+    species == "salvins_mollymawk" ~ "Salvin's albatross [M - EP, SA, SO]",
+    species == "black_browed_mollymawk" ~ "Black-browed albatross [D - SO]",
     species == "fairy_prion" ~ "Fairy prion [D - SWP, SO]",
     species == "black_bellied_storm_petrel" ~ "Black-bellied storm petrel [M - SWP]",
     species == "campbell_albatross" ~ "Campbell albatross [M - TS/A, SWP]",
@@ -178,11 +178,11 @@ for (sp in spp) {
 }
 
 ## Save model results
-saveRDS(sp_Bernoulli_year_models,
-        "./results/glm-Bernoulli_spp-dist-coast-years.rds")
+# saveRDS(sp_Bernoulli_year_models,
+#         "./results/glm-Bernoulli_spp-dist-coast-years.rds")
 
-## Plot results
-plot_prob_occ_species_year <- 
+## Plot results (conditional to distance from coast)
+plot_prob_occ_species_distcoastyear <- 
   ggplot(data = dfs_yfit_year_sp,
        aes(x = taiaroa_east, y = yfit, group = as.factor(year), colour = as.factor(year))) +
   geom_line() + 
@@ -203,12 +203,84 @@ plot_prob_occ_species_year <-
         legend.position = c(0.8, 0.05)) +
   guides(colour = guide_legend(nrow = 2))
 
-ggsave(plot_prob_occ_species_year,
-       filename = "./results/glm-Bernoulli_spp-years.pdf",
-       height = 25, width = 40, units = "cm", dpi = 300)
+# ggsave(plot_prob_occ_species_distcoastyear,
+#        filename = "./results/glm-Bernoulli_spp-years.pdf",
+#        height = 25, width = 40, units = "cm", dpi = 300)
 
-rm("sp_Bernoulli_year_models", "dfs_yfit_year_sp",
-   "plot_prob_occ_species_year")
+
+### Get coeff+CI for the year parameter
+df_year_slope <- data.frame(sp_name = rep(NA, length(sp_Bernoulli_year_models)),
+                            coeff = rep(NA, length(sp_Bernoulli_year_models)),
+                            confint2 = rep(NA, length(sp_Bernoulli_year_models)),
+                            confint95 = rep(NA, length(sp_Bernoulli_year_models)),
+                            p_value = rep(NA, length(sp_Bernoulli_year_models)))
+
+for(i in 1:length(sp_Bernoulli_year_models)){
+  
+  tmp_summary <- summary(sp_Bernoulli_year_models[[i]])
+  
+  df_year_slope[i, ] <- 
+    data.frame(sp_name = names(sp_Bernoulli_year_models[i]),
+               coeff = sp_Bernoulli_year_models[[i]][["coefficients"]][["year"]],
+               confint2 = confint(sp_Bernoulli_year_models[[i]])[3,1], 
+               confint95 = confint(sp_Bernoulli_year_models[[i]])[3,2],
+               p_value = tmp_summary[["coefficients"]][3,4]
+    )
+  
+  rm("tmp_summary", "i")
+}
+
+## For Cook's petrel, the CIs are a bit all over the show and it couldn't estimate an upper CI
+# confint(sp_Bernoulli_year_models[["Cook's petrel [M - NP, EP]"]])
+#                     2.5 %       97.5 %
+# (Intercept)            NA 3.302257e+05
+# dist_coast    -0.06917448 3.371251e-02
+# year        -163.23577458           NA
+
+df_year_slope <- 
+  df_year_slope %>% 
+  dplyr::mutate(evidence = 
+                  factor(dplyr::case_when(
+                    ## Following Muff et al. (2022) Trends Ecol. Evol.
+                    p_value > 0.5 ~ "No",
+                    p_value <= 0.5 & p_value > 0.1 ~ "Little",
+                    p_value <= 0.1 & p_value > 0.05 ~ "Weak",
+                    p_value <= 0.05 & p_value > 0.01 ~ "Moderate",
+                    p_value <= 0.01 & p_value > 0.001 ~ "Strong",
+                    p_value <= 0.001 ~ "Very strong"), 
+                    levels = c("No", "Little", "Weak", "Moderate", "Strong", "Very strong"))
+                ) %>% 
+  dplyr::mutate(sp_name_order = forcats::fct_reorder(sp_name, as.numeric(evidence)))
+
+## 15 (38%) out of 39 of the species have weak-to-strong evidence 
+## of changing their probability of occurrence related to year
+# table(df_year_slope$evidence)
+
+plot_coeff_CI_year <- 
+  ggplot(data = df_year_slope[! df_year_slope$sp_name == "Cook's petrel [M - NP, EP]", ]) +
+  geom_point(aes(x = coeff, y = sp_name_order, color = evidence), size = 2.5) +
+  geom_errorbar(aes(y = sp_name, xmin = confint2, xmax = confint95, color = evidence), #color = "black",
+                width = 0.5) +
+  scale_color_manual(values = c(hcl.colors(10, "Mako", rev = T)[c(2,3,6,7,10)])) + # hcl.colors(7, "Oslo")[c(3,5:7)]
+  geom_vline(xintercept = 0,
+             linetype = "longdash", colour = "grey50") +
+  ylab("") +  xlab("Coefficient + C.I.") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10, colour = "black"),
+        axis.title.y = element_text(size = 11, colour = "black"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.8, 0.16))
+
+# ggsave(plot_coeff_CI_year,
+#        filename = "./results/glm-Bernoulli_spp-years_year-coeff-CIs.pdf",
+#        height = 19, width = 15, units = "cm", dpi = 300)
+
+rm("sp_Bernoulli_year_models", 
+   "dfs_yfit_year_sp",
+   "plot_prob_occ_species_distcoastyear",
+   "df_year_slope",
+   "plot_coeff_CI_year")
 
 ## Bernoulli GLM (y ~ dist_coast, per season) ####
 
@@ -244,9 +316,9 @@ for (sp in spp) {
   rm("sp", "sp_i", "tmp", "glm_tmp", "df_yfit_seasons_sp")
 }
 
-## Save model results
-saveRDS(sp_Bernoulli_seasons_models,
-        "./results/glm-Bernoulli_spp-dist-coast-seasons.rds")
+# ## Save model results
+# saveRDS(sp_Bernoulli_seasons_models,
+#         "./results/glm-Bernoulli_spp-dist-coast-seasons.rds")
 
 ## Plot results
 plot_prob_occ_species_seasons <- 
@@ -270,7 +342,10 @@ plot_prob_occ_species_seasons <-
         legend.position = c(0.8, 0.05)) +
   guides(colour = guide_legend(nrow = 1))
 
-ggsave(plot_prob_occ_species_seasons,
-       filename = "./results/glm-Bernoulli_spp-seasons.pdf",
-       height = 25, width = 40, units = "cm", dpi = 300)
+# ggsave(plot_prob_occ_species_seasons,
+#        filename = "./results/glm-Bernoulli_spp-seasons.pdf",
+#        height = 25, width = 40, units = "cm", dpi = 300)
 
+rm("sp_Bernoulli_seasons_models",
+   "dfs_yfit_seasons_sp",
+   "plot_prob_occ_species_seasons")

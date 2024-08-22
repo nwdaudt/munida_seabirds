@@ -9,7 +9,7 @@
 ## In the former, Nico and Graeme digitised data living on Graemes's notebooks 
 ## in a format ready for Graeme to upload them into eBird. In the later, a few 
 ## Munida voyages were already uploaded into eBird, and notebooks were missing -- 
-## so, we got the data from eBird itself. However, the formatation doesn't match 
+## so, we got the data from eBird itself. However, the format doesn't match 
 ## with the 'digitised' ones.
 
 ## This script wrangles, standardises, and merge these both datasets sources.
@@ -296,7 +296,7 @@ ebird_data$Location <-
   gsub(pattern = "-", replacement = ".", x = ebird_data$Location)
 
 # Check
-unique(ebird_data$Location)
+# unique(ebird_data$Location)
 
 # Filter transects (/records) after 60 km (see details above in 'all_data_long')
 ebird_data <- 
@@ -425,18 +425,18 @@ all_data_long <-
   dplyr::mutate(species_nice_name = dplyr::case_when(
     species == "black_backed_gull" ~ "Black-backed gull",
     species == "red_billed_gull" ~ "Red-billed gull",
-    species == "white_capped_mollymawk" ~ "White-capped mollymawk",
+    species == "white_capped_mollymawk" ~ "White-capped albatross",
     species == "white_fronted_tern" ~ "White-fronted tern",
     species == "sooty_shearwater" ~ "Sooty shearwater",
     species == "cape_petrel" ~ "Cape petrel",
     species == "southern_royal_albatross" ~ "Southern royal albatross",
-    species == "bullers_mollymawk" ~ "Buller's mollymawk",
+    species == "bullers_mollymawk" ~ "Buller's albatross",
     species == "white_chinned_petrel" ~ "White-chinned petrel",
     species == "bullers_shearwater" ~ "Buller's shearwater",
     species == "hutton_fluttering_shearwater" ~ "Hutton's/Fluttering shearwater",
     species == "northern_royal_albatross" ~ "Northern royal albatross",
-    species == "salvins_mollymawk" ~ "Salvin's mollymawk",
-    species == "black_browed_mollymawk" ~ "Black-browed mollymawk",
+    species == "salvins_mollymawk" ~ "Salvin's albatross",
+    species == "black_browed_mollymawk" ~ "Black-browed albatross",
     species == "fairy_prion" ~ "Fairy prion",
     species == "black_bellied_storm_petrel" ~ "Black-bellied storm petrel",
     species == "campbell_albatross" ~ "Campbell albatross",
@@ -448,7 +448,7 @@ all_data_long <-
     species == "broad_billed_prion" ~ "Broad-billed prion",
     species == "white_headed_petrel" ~ "White-headed petrel",
     species == "spotted_shag" ~ "Spotted shag",
-    species == "chatham_mollymawk" ~ "Chatham mollymawk",
+    species == "chatham_mollymawk" ~ "Chatham albatross",
     species == "wilsons_storm_petrel" ~ "Wilson's storm petrel",
     species == "grey_backed_storm_petrel" ~ "Grey-backed storm petrel",
     species == "southern_giant_petrel" ~ "Southern giant petrel",
@@ -479,8 +479,8 @@ all_data_long <-
     species == "unknown_shearwater" ~ "Unknown shearwater", 
     species == "unknown_prion" ~ "Unknown prion", 
     species == "unknown_gadfly" ~ "Unknown gadfly",
-    species == "unknown_albatross" ~ "Unknown albatross",
-    species == "unknown_mollymawk" ~ "Unknown mollymawk"
+    species == "unknown_albatross" ~ "Unknown (great) albatross",
+    species == "unknown_mollymawk" ~ "Unknown (small) albatross"
   ), .after = species)
 
 write.csv(all_data_long,

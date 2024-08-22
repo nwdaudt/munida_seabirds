@@ -386,8 +386,10 @@ BIC(gllvm_full_lv0_taiaroa, gllvm_full_lv0_distcoast,
 
 ### Clear environment, as these models will not be used further
 rm("gllvm_full_lv0_taiaroa", 
-   "gllvm_full_lv1_taiaroa", "gllvm_full_lv1_distcoast",
-   "gllvm_full_lv2_taiaroa", "gllvm_full_lv2_distcoast")
+   "gllvm_full_lv1_taiaroa", 
+   "gllvm_full_lv2_taiaroa" 
+   #, "gllvm_full_lv1_distcoast", "gllvm_full_lv2_distcoast"
+   )
 
 ## Covariate selection in model 'gllvm_full_lv0_distcoast' #### 
 
@@ -497,7 +499,6 @@ BIC(gllvm_full_lv0_distcoast,
 # plot(gllvm_full_lv0_distcoast_distcoast.season, which = 1:4, mfrow = c(2,2))
 # dev.off()
 
-
 ### Save the model objects
 # saveRDS(gllvm_full_lv0_distcoast_distcoast.season,
 #         file = "./results/gllvm_best-model_lv0_distcoast-season_model.rds")
@@ -512,19 +513,22 @@ rm("gllvm_full_lv0_distcoast",
 
 ## Coefficient plots for the 'best model' (~ dist_coast + season) ####
 
+gllvm_full_lv0_distcoast_distcoast.season <- 
+  readRDS("./results/gllvm_best-model_lv0_distcoast-season_model.rds")
+
 # Adjust species name for plot -- a bit of a manual job...
 gllvm_spp <- rownames(gllvm_full_lv0_distcoast_distcoast.season$params$Xcoef)
 gllvm_spp <- snakecase::to_sentence_case(gllvm_spp)
 gllvm_spp[1] <- "Black-backed gull"
 gllvm_spp[2] <- "Red-billed gull"
-gllvm_spp[3] <- "White-capped mollymawk"
+gllvm_spp[3] <- "White-capped albatross"
 gllvm_spp[4] <- "White-fronted tern"
-gllvm_spp[8] <- "Buller's mollymawk"
+gllvm_spp[8] <- "Buller's albatross"
 gllvm_spp[9] <- "White-chinned petrel"
 gllvm_spp[10] <- "Buller's shearwater"
 gllvm_spp[11] <- "Hutton's/Fluttering shearwater"
-gllvm_spp[13] <- "Salvin's mollymawk"
-gllvm_spp[14] <- "Black-browed mollymawk"
+gllvm_spp[13] <- "Salvin's albatross"
+gllvm_spp[14] <- "Black-browed albatross"
 gllvm_spp[16] <- "Black-bellied storm petrel"
 gllvm_spp[20] <- "Light-mantled albatross"
 gllvm_spp[21] <- "Black-fronted tern"
@@ -614,23 +618,23 @@ rm("gllvm_spp", "gllvm_spp_ordered", "At.y")
 
 ## The idea of this section is compare the effects of including Latent Variables (LV) in the models.
 ## Although BIC and AIC values suggests the model without LVs is the best, we want to check this further.
-## The previous section showed that the full model had lowest BIC and AIC values compared to models with 
-## single predictors (i.e. 'distcoast-only' or 'season-only'). 
+
 ## So, to compare the influence of LVs, we selected the full 'distcoast' models that used LV == 0, 1, and 2.
-## We then get the expected values for each model, for each species, and plot them all together to verify
+## We then get the predicted/expected values for each model, for each species, and plot them all together to verify
 ## any possible (dis)agreement between models. 
 
-# unconstrained_pred_model_lv0_distcoast <- readRDS("./results/gllvm_unconstrained_pred_lv0_distcoast_model.rds")
-# unconstrained_pred_model_lv1_distcoast <- readRDS("./results/gllvm_unconstrained_pred_lv1_distcoast_model.rds")
-# unconstrained_pred_model_lv2_distcoast <- readRDS("./results/gllvm_unconstrained_pred_lv2_distcoast_model.rds")
+# gllvm_full_lv0_distcoast
+# gllvm_full_lv1_distcoast
+# gllvm_full_lv2_distcoast
 
 ## Get predicted/expected values for unconstrained model without LVs [LV == 0] (lv0)
 
 fitmod_lv0 <- data.frame(
   exp(
-    predict(unconstrained_pred_model_lv0_distcoast, 
+    predict(gllvm_full_lv0_distcoast, 
             newX = data.frame(season = wide_data$season,
-                              dist_coast = wide_data$dist_coast))
+                              dist_coast = wide_data$dist_coast,
+                              water_mass = wide_data$water_mass))
   )
 )
 
@@ -648,9 +652,10 @@ fitlong_lv0 <-
 
 fitmod_lv1 <- data.frame(
   exp(
-    predict(unconstrained_pred_model_lv1_distcoast, 
+    predict(gllvm_full_lv0_distcoast, 
             newX = data.frame(season = wide_data$season,
-                              dist_coast = wide_data$dist_coast))
+                              dist_coast = wide_data$dist_coast,
+                              water_mass = wide_data$water_mass))
   )
 )
 
@@ -668,9 +673,10 @@ fitlong_lv1 <-
 
 fitmod_lv2 <- data.frame(
   exp(
-    predict(unconstrained_pred_model_lv2_distcoast, 
+    predict(gllvm_full_lv2_distcoast, 
             newX = data.frame(season = wide_data$season,
-                              dist_coast = wide_data$dist_coast))
+                              dist_coast = wide_data$dist_coast,
+                              water_mass = wide_data$water_mass))
   )
 )
 
@@ -722,13 +728,14 @@ ggsave(plot_comparing_lv0_lv1_lv2_raw,
        filename = "./results/comparing_pred-lv0-lv1-lv2-distcoast-models_with_raw-data.pdf",
        height = 25, width = 40, units = "cm", dpi = 300)
 
-## The plot shows that all, LV==0, LV==1 and LV==2 have very similar results when predicting values. 
-## Therefore, we will stick with the best model according to BICvalues (i.e. LV==0).
+## The plot shows that all, LV==0, LV==1 and LV==2 have *very* similar results when predicting values. 
+## Therefore, we will stick with the best model according to BIC values (i.e. LV==0).
 
 ## (In a particular case, for black_billed_gull, note that LV == 2 seems to have had a better fit.)
 
 rm("plot_comparing_lv0_lv1_lv2_raw",
    "df_lv0_lv1_lv2_raw",
-   "unconstrained_pred_model_lv1_distcoast",
-   "unconstrained_pred_model_lv2_distcoast")
+   "gllvm_full_lv0_distcoast",
+   "gllvm_full_lv1_distcoast",
+   "gllvm_full_lv2_distcoast")
 
