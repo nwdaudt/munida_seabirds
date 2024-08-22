@@ -15,7 +15,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(patchwork)
-library(mvabund)
+# library(mvabund)
 
 ## Read data ####
 data <- 
@@ -100,10 +100,10 @@ data_soi <-
 
 ## NIWA (until 2022)
 # soi_phases_since_1880s <- 
-#   read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv")
+#   read.csv("./data-raw/SOI-phases_NIWA/southern-oscillation-index-1876-to-2022.csv")
 # 
 # soi_phases <- 
-#   read.csv("./data-raw/SOI-phases/southern-oscillation-index-1876-to-2022.csv") %>% 
+#   read.csv("./data-raw/SOI-phases_NIWA/southern-oscillation-index-1876-to-2022.csv") %>% 
 #   dplyr::filter(year >= 2015) %>% 
 #   dplyr::mutate(month_number = match(month, month.abb)) %>% 
 #   dplyr::select(year, month_number, soi_phase)
@@ -248,81 +248,83 @@ rm("data_soi_plot", "less_than_3_obs", "violin_counts_soi")
 
 ## {mvabund} ---------------------------------------------------------------####
 #------------------------------------------------------------------------------#
-
-data_soi_wide <- 
-  # Get ENSO phases into the wide-format data
-  dplyr::left_join(data_wide,
-                   (data_soi %>% 
-                      dplyr::select(id, soi_phase) %>% 
-                      dplyr::distinct(id, soi_phase)),
-                   by = "id") %>% 
-  # 2023 do not have data on ENSO phases
-  dplyr::filter(! year == "2023") %>% 
-  # To use 'Neutral' as the Intercept in the model, specify levels to the factor
-  dplyr::mutate(soi_phase = factor(soi_phase,
-                                   levels = c("Neutral", 
-                                              "El Niño",
-                                              "La Niña")))
-
-### Get the multivariate data into the right format
-Y <- 
-  mvabund::as.mvabund(data_soi_wide[, colnames(data_soi_wide) %in% sp_only_cols])
-
-# pdf(file = "./results/mvGLM_mean-var-plot.pdf")
-# mvabund::meanvar.plot(Y)
-# dev.off()
-
-### Specify the model 
-mvGLM_ENSO <- 
-  mvabund::manyglm(Y ~ soi_phase,
-                   data = data_soi_wide,
-                   family = "negative.binomial")
-
-### Residuals
-# pdf(file = "./results/mvGLM_Y-ENSO_residuals.pdf")
-# plot(mvGLM_ENSO, which = 1:3)
-# dev.off()
-
-### Results ---
-
-summary(mvGLM_ENSO)
-
-# Test statistics:
-#                  wald value Pr(>wald)    
-# (Intercept)           61.08     0.001 ***
-# soi_phaseEl Niño       5.20     0.459    
-# soi_phaseLa Niña       6.95     0.180    
-# --- 
-#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+#
+# ### There results *were not* used in the manuscript, but I'll leave the code here anyway 
 # 
-# Test statistic:  8.621, p-value: 0.269 
-# Arguments:
-#   Test statistics calculated assuming response assumed to be uncorrelated 
-#   P-value calculated using 999 resampling iterations via pit.trap resampling (to account for correlation in testing).
-
-anova(mvGLM_ENSO)
-# > This gives an analysis of deviance table where we use likelihood ratio tests and 
-# > resampled p values to look for a significant effect of ENSO on the community data
-
-# Analysis of Deviance Table
+# data_soi_wide <- 
+#   # Get ENSO phases into the wide-format data
+#   dplyr::left_join(data_wide,
+#                    (data_soi %>% 
+#                       dplyr::select(id, soi_phase) %>% 
+#                       dplyr::distinct(id, soi_phase)),
+#                    by = "id") %>% 
+#   # 2023 do not have data on ENSO phases
+#   dplyr::filter(! year == "2023") %>% 
+#   # To use 'Neutral' as the Intercept in the model, specify levels to the factor
+#   dplyr::mutate(soi_phase = factor(soi_phase,
+#                                    levels = c("Neutral", 
+#                                               "El Niño",
+#                                               "La Niña")))
 # 
-# Model: Y ~ soi_phase
+# ### Get the multivariate data into the right format
+# Y <- 
+#   mvabund::as.mvabund(data_soi_wide[, colnames(data_soi_wide) %in% sp_only_cols])
 # 
-# Multivariate test:
-#             Res.Df Df.diff   Dev Pr(>Dev)
-# (Intercept)     33                       
-# soi_phase       31       2 123.4    0.162
-# Arguments:
-#   Test statistics calculated assuming uncorrelated response (for faster computation) 
-# P-value calculated using 999 iterations via PIT-trap resampling.
-
-mvGLM_anova_puni <- anova(mvGLM_ENSO, p.uni = "adjusted")
-# Treatment (ENSO) effect on mean abundance 
-mvGLM_anova_puni[["table"]]
-# Species-specific tests
-View(
-  cbind(
-    Dev = t(mvGLM_anova_puni[["uni.test"]])[,2], 
-    p_value = t(mvGLM_anova_puni[["uni.p"]])[,2]
-    ))
-# anova(mvGLM_ENSO, p.uni = "adjusted") # straight like this it returns Dev and Pr(>Dev)
+# # pdf(file = "./results/mvGLM_mean-var-plot.pdf")
+# # mvabund::meanvar.plot(Y)
+# # dev.off()
+# 
+# ### Specify the model 
+# mvGLM_ENSO <- 
+#   mvabund::manyglm(Y ~ soi_phase,
+#                    data = data_soi_wide,
+#                    family = "negative.binomial")
+# 
+# ### Residuals
+# # pdf(file = "./results/mvGLM_Y-ENSO_residuals.pdf")
+# # plot(mvGLM_ENSO, which = 1:3)
+# # dev.off()
+# 
+# ### Results ---
+# 
+# summary(mvGLM_ENSO)
+# 
+# # Test statistics:
+# #                  wald value Pr(>wald)    
+# # (Intercept)           61.08     0.001 ***
+# # soi_phaseEl Niño       5.20     0.459    
+# # soi_phaseLa Niña       6.95     0.180    
+# # --- 
+# #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+# # 
+# # Test statistic:  8.621, p-value: 0.269 
+# # Arguments:
+# #   Test statistics calculated assuming response assumed to be uncorrelated 
+# #   P-value calculated using 999 resampling iterations via pit.trap resampling (to account for correlation in testing).
+# 
+# anova(mvGLM_ENSO)
+# # > This gives an analysis of deviance table where we use likelihood ratio tests and 
+# # > resampled p values to look for a significant effect of ENSO on the community data
+# 
+# # Analysis of Deviance Table
+# # 
+# # Model: Y ~ soi_phase
+# # 
+# # Multivariate test:
+# #             Res.Df Df.diff   Dev Pr(>Dev)
+# # (Intercept)     33                       
+# # soi_phase       31       2 123.4    0.162
+# # Arguments:
+# #   Test statistics calculated assuming uncorrelated response (for faster computation) 
+# # P-value calculated using 999 iterations via PIT-trap resampling.
+# 
+# mvGLM_anova_puni <- anova(mvGLM_ENSO, p.uni = "adjusted")
+# # Treatment (ENSO) effect on mean abundance 
+# mvGLM_anova_puni[["table"]]
+# # Species-specific tests
+# View(
+#   cbind(
+#     Dev = t(mvGLM_anova_puni[["uni.test"]])[,2], 
+#     p_value = t(mvGLM_anova_puni[["uni.p"]])[,2]
+#     ))
+# # anova(mvGLM_ENSO, p.uni = "adjusted") # straight like this it returns Dev and Pr(>Dev)

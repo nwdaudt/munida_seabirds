@@ -1,5 +1,11 @@
+## 
+## ENSO 
+##
+## -------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
 
-
+## This script develop maps to be edited later in Inkscape for the 
+## study area figure in the manuscript (Fig 1)
 
 ## Libraries ####
 library(dplyr)
