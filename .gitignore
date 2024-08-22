@@ -1,9 +1,13 @@
 data-raw/
-data-processed/
-rmd_tex/
 
-## RDS files
+## Unnecessary docx/comments files 
+rmd_tex/outline-and-other-text-files/
+rmd_tex/svg-figs/*.svg
+
+## RDS, CSV, PNG files
 results/*.rds
+results/*.csv
+results/*.png
 
 # History files
 .Rhistory
