@@ -9,11 +9,11 @@ A hard copy of this repository is archived at the [Open Science Framework].
 - Does seasonality influence assemblages of seabird species off southeast New Zealand?
 - Are species' distributions changing over time?
 
-Here, we used a seabird observations undertaken during the Munida Time Series voyages to explore these questions. The 'Munida transect' runs bi-monthly a 60 km offshore transect departing from the Taiaroa Head (Otago Peninsula, Aotearoa New Zealand). The main goal of these voyages is to monitor ocean acidification, including several other biogeochemical markers. It has been going on since 1998, making the Munida transect one of the longest time-series on ocean acidification globally. In addition to its primary goal, the Munida transect allows for collecting other biological and oceanographic samples---including visual surveys of marine megafauna, such as seabirds.
+This study used seabird observations undertaken during the Munida Time Series voyages to explore these questions. The 'Munida transect' runs bi-monthly a 60 km offshore transect departing from the Taiaroa Head (Otago Peninsula, Aotearoa New Zealand). The main goal of these voyages is to monitor ocean acidification, including several other biogeochemical markers. It has been going on since 1998, making the Munida transect one of the longest time series on ocean acidification globally. In addition to its primary goal, the Munida transect allows for the collection of other biological and oceanographic samples---including visual surveys of marine megafauna, such as seabirds.
 
-An interesting feature about this transect is that it consistently samples across Neritic, Subtropical Surface and Subantarctic Waters. Very often it crosses the Southland Front, a local expression of the global Subtropical Front. Therefore, using seabird *in situ* observations while carrying out these voyages is an excellent scenario to test whether seabird occurrence responds to water mass even in 'small' scales (i.e. coarse scale, 1--100 km).
+An interesting feature about this transect is that it consistently samples across Neritic, Subtropical Surface and Subantarctic Waters. It often crosses the Southland Front, a local expression of the global Subtropical Front. Therefore, using seabird *in situ* observations while carrying out these voyages is an excellent scenario to test whether seabird occurrence responds to water mass even in 'small' scales (i.e. coarse scale, 1--100 km).
 
-The observations are from 2015 to 2023 (nine years), and they consist of the maximum number of individuals counted (at once), within equal-length 5 km 'segments' along the Munida transect.
+The observations are from 2015 to 2023 (nine years), consisting of the maximum number of individuals counted (at once) within equal-length 5 km 'segments' along the Munida transect.
 
 ***
 

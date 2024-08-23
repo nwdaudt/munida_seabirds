@@ -46,13 +46,12 @@ These were the main scripts used for data wrangling and analyses (solid-line squ
   - Yearly probability of occurrence, conditional to distance from coast (**Figure 6, 7**)
   - Seasonal probability of occurrence, conditional to distance from coast (**Figure S5**)
 
-The following scripts were part of exploratory data analysis and were not officially reported in the manuscript (dotted-line diamonds, in the figure above).
+The following scripts were part of exploratory data analysis and were not officially reported in the manuscript (dotted-line diamonds, in the figure above). **Note**: the data is not ideal to run these analyses, as briefly discussed under 'Limitations of the study' in the manuscript.
 
 * **'06': ENSO**
   - Summary of ENSO phases per year and voyages (**Figure S6**)
 * **'07': Variograms**
   - Spatial correlation among seabird observations for each species
-  - **Note**: the data is not ideal to run this analysis, as briefly discussed in the manuscript.
 
 Script **'08'** is just an auxiliary script for exporting each of the **Figure 1** (study area) individual panels.
 
