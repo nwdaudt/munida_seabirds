@@ -67,7 +67,7 @@ munida_seabirds
 
 ## How to run
 
-You should be able to reproduce all results using scripts in [`./scripts`](https://github.com/nwdaudt/munida_seabirds/tree/main/scripts) and files from `./data-processed`. The `./scripts/README.md` file will guide you through each step.
+You should be able to reproduce all results using scripts in [`./scripts`](https://github.com/nwdaudt/munida_seabirds/tree/main/scripts) and files from [`./data-processed`](https://github.com/nwdaudt/munida_seabirds/tree/main/data-processed). The `./scripts/README.md` file will guide you through each step.
 
 ### Environment
 
