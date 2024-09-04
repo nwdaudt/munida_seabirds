@@ -141,9 +141,14 @@ long_data_pa <-
     species == "yellow_eye_penguin" ~ "Yellow-eyed penguin [S]",
   ), .after = species)
 
+## As good practice for modelling, centre 'year' and 'dist_coast'
+long_data_pa$dist_coast <- scale(long_data_pa$dist_coast, scale = FALSE)
+long_data_pa$year <- scale(long_data_pa$year, scale = FALSE)
+
+## Get a vector with species names to loop through
 spp <- unique(long_data_pa$species_nice_name)
 
-## Bernoulli GLM (y ~ dist_coast, per year) ####
+## Bernoulli GLM (y ~ dist_coast + year) ####
 
 # List to save models
 sp_Bernoulli_year_models <- list()
@@ -282,7 +287,7 @@ rm("sp_Bernoulli_year_models",
    "df_year_slope",
    "plot_coeff_CI_year")
 
-## Bernoulli GLM (y ~ dist_coast, per season) ####
+## Bernoulli GLM (y ~ dist_coast + season) ####
 
 # List to save models
 sp_Bernoulli_seasons_models <- list()
