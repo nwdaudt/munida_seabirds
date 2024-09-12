@@ -142,8 +142,10 @@ long_data_pa <-
   ), .after = species)
 
 ## As good practice for modelling, centre 'year' and 'dist_coast'
-long_data_pa$dist_coast <- scale(long_data_pa$dist_coast, scale = FALSE)
-long_data_pa$year <- scale(long_data_pa$year, scale = FALSE)
+long_data_pa <-
+  long_data_pa %>% 
+  dplyr::mutate(dist_coast = scale(long_data_pa$dist_coast, scale = FALSE)[,1],
+                year_centre = scale(long_data_pa$year, scale = FALSE)[,1])
 
 ## Get a vector with species names to loop through
 spp <- unique(long_data_pa$species_nice_name)
@@ -167,7 +169,7 @@ for (sp in spp) {
     dplyr::filter(species_nice_name == sp_i)
   
   # Fit the model
-  glm_tmp <- glm(p_a ~ dist_coast + year, data = tmp, family = binomial(link = "logit"))
+  glm_tmp <- glm(p_a ~ dist_coast + year_centre, data = tmp, family = binomial(link = "logit"))
   
   sp_Bernoulli_year_models[[sp_i]] <- glm_tmp
   
@@ -226,7 +228,7 @@ for(i in 1:length(sp_Bernoulli_year_models)){
   
   df_year_slope[i, ] <- 
     data.frame(sp_name = names(sp_Bernoulli_year_models[i]),
-               coeff = sp_Bernoulli_year_models[[i]][["coefficients"]][["year"]],
+               coeff = sp_Bernoulli_year_models[[i]][["coefficients"]][["year_centre"]],
                confint2 = confint(sp_Bernoulli_year_models[[i]])[3,1], 
                confint95 = confint(sp_Bernoulli_year_models[[i]])[3,2],
                p_value = tmp_summary[["coefficients"]][3,4]
