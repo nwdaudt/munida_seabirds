@@ -1,8 +1,8 @@
-# Changing species occurrences in seasonal seabird assemblages at the Subtropical Frontal Zone off southeast Aotearoa New Zealand
+# Changing species occurrences in seasonal seabird assemblages at the Subtropical Frontal Zone
 
 This repository hosts code and data from [Daudt *et al.*](https://github.com/nwdaudt/munida_seabirds/tree/main?tab=readme-ov-file#citation) (in review).
 
-A hard copy of this repository is archived at the [Open Science Framework].
+A hard copy of this repository is archived at the [Open Science Framework](https://osf.io/64vfm/).
 
 ***
 - Can we define assemblages of seabird species based on water masses at coarse scale (1--100 km)?
@@ -55,13 +55,9 @@ munida_seabirds
 ├── ./results
 │   ├── ./variograms
 │   └── PDF, CSV, and PNG files with results and EDA analyses
-├── ./rmd_tex
-│   │  └── ./svg-figs
-│   ├── manuscript.Rmd
-│   ├── doc_template.docx
-│   ├── manuscript.docx
-│   ├── manuscript-supplement.doc
-│   └── references.bib
+├── ./rmd_tex ** untracked folder (at the moment) containing the manuscript
+│      ├── ./svg-figs
+│      └── ./TeX
 └── munida_seabirds.Rproj
 ```
 
@@ -104,4 +100,4 @@ Any bugs, suggestions, or enquires, please feel free to contact me or open an is
 
 Please refer to the original paper if using any piece of this repository (code and/or data). This repository is under CC BY 4.0 license.
 
-Daudt, NW; Loh, G; Currie, KI; Schofield, MR; Smith, RO; Woehler, EJ; Bugoni, L; Rayment, WJ. (in review). Changing species occurrences in seasonal seabird assemblages at the Subtropical Frontal Zone off southeast Aotearoa New Zealand.
+Daudt, NW; Loh, G; Currie, KI; Schofield, MR; Smith, RO; Woehler, EJ; Bugoni, L; Rayment, WJ. (in review). Changing species occurrences in seasonal seabird assemblages at the Subtropical Frontal Zone.
