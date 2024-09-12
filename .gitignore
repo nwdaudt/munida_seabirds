@@ -2,7 +2,15 @@ data-raw/
 
 ## Unnecessary docx/comments files 
 rmd_tex/outline-and-other-text-files/
-rmd_tex/svg-figs/*.svg
+rmd_tex/svg-figs/
+rmd_tex/Rmd/
+
+rmd_tex/TeX/*.pdf
+rmd_tex/TeX/*.gz
+rmd_tex/TeX/*.spl
+rmd_tex/TeX/*.log
+rmd_tex/TeX/*.blg
+rmd_tex/TeX/*.bbl
 
 ## RDS, CSV, PNG files
 results/*.rds
