@@ -52,10 +52,10 @@ data$taiaroa_east <-
                     "TaiaroaEast20.25km", "TaiaroaEast25.30km",
                     "TaiaroaEast30.35km", "TaiaroaEast35.40km",
                     "TaiaroaEast40.45km", "TaiaroaEast45.50km",
-                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"))#,
-         # labels = c("0-5 km", "5-10 km", "10-15 km", "15-20 km",
-         #            "20-25 km", "25-30 km", "30-35 km", "35-40 km",
-         #            "40-45 km", "45-50 km", "50-55 km", "55-60 km"))
+                    "TaiaroaEast50.55km", "TaiaroaEast55.60km"),
+         labels = c("0-5 km", "5-10 km", "10-15 km", "15-20 km",
+                    "20-25 km", "25-30 km", "30-35 km", "35-40 km",
+                    "40-45 km", "45-50 km", "50-55 km", "55-60 km"))
 
 data$direction <- 
   factor(data$direction,
@@ -110,6 +110,10 @@ spp_matrix <-
   # But, remove rare species columns -- they will be more noisy than explanatory
   dplyr::select(- all_of(sp_rare_cols))
 
+### ----------- Presence/Absence ----------- ###
+# spp_matrix_pa <- spp_matrix
+# spp_matrix_pa[spp_matrix_pa > 0] <- 1
+
 ## Unconstrained ordination, purely biological (Null model) ####
 
 ### Run NULL models with 1 and 2 LV, respectively
@@ -133,6 +137,11 @@ BIC(gllvm_null_model_lv1, gllvm_null_model_lv2)
 # gllvm_null_model_lv1 117 14819.02
 # gllvm_null_model_lv2 155 14643.49 ## -->> best model
 
+## Run AIC's just to have another layer of check
+# AIC(gllvm_null_model_lv1, gllvm_null_model_lv2)
+# AICc(gllvm_null_model_lv1, gllvm_null_model_lv2)
+## -->> All Information Criteria suggest 'lv2' model fits better
+
 ### Residual plots
 
 # plot(gllvm_null_model_lv1, which = 1:4, mfrow = c(2,2))
@@ -146,7 +155,7 @@ BIC(gllvm_null_model_lv1, gllvm_null_model_lv2)
 #         file = "./results/gllvm_null-model_lv2.rds")
 
 ### You can load the files back instead of running the models again
-# gllvm_null_model_lv2 <- readRDS("./results/gllvm_unconstrained_biol_lv2_model.rds")
+# gllvm_null_model_lv2 <- readRDS("./results/gllvm_null-model_lv2.rds")
 
 ### Get LV values and arrange it in a dataframe to plot
 
@@ -167,7 +176,7 @@ plot_null_model_watermass <-
   xlab("Latent Variable 1") + ylab("Latent Variable 2") +
   theme_bw() + 
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
+        axis.text = element_text(size = 12),
         legend.title = element_blank(),
         legend.text = element_text(size = 10),
         legend.position = "bottom")
@@ -189,7 +198,7 @@ plot_null_model_season <-
   xlab("Latent Variable 1") + ylab("Latent Variable 2") +
   theme_bw() + 
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
+        axis.text = element_text(size = 12),
         legend.title = element_blank(),
         legend.text = element_text(size = 10),
         legend.position = "bottom")
@@ -240,7 +249,7 @@ plot_null_model_taiaroa <-
   xlab("Latent Variable 1") + ylab("Latent Variable 2") +
   theme_bw() + 
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
+        axis.text = element_text(size = 12),
         legend.title = element_blank(),
         legend.text = element_text(size = 9),
         legend.position = "bottom")
@@ -267,6 +276,128 @@ ggsave(plot_null_model_taiaroa,
 # rm("plot_null_model_watermass")
 # rm("plot_null_model_taiaroa", "palette_12cols")
 # rm("plot_null_model_season")
+
+## Unconstrained ordination, purely biological (Null model), *with voyage random effect* ####
+
+# gllvm_null_model_lv1_re <-
+#   gllvm::gllvm(y = spp_matrix, 
+#                X = data.frame(voyage = wide_data$id),
+#                num.lv = 1, 
+#                family = "negative.binomial",
+#                row.eff = ~(1|voyage),
+#                seed = 321)
+
+gllvm_null_model_lv2_re <-
+  gllvm::gllvm(y = spp_matrix, 
+               X = data.frame(voyage = wide_data$id),
+               num.lv = 2, 
+               family = "negative.binomial",
+               row.eff = ~(1|voyage),
+               seed = 321)
+
+BIC(gllvm_null_model_lv1_re, gllvm_null_model_lv2_re)
+#                          df      BIC
+# gllvm_null_model_lv1_re 118 14622.57
+# gllvm_null_model_lv2_re 156 14702.92
+
+AIC(gllvm_null_model_lv1_re, gllvm_null_model_lv2_re)
+#                          df      AIC
+# gllvm_null_model_lv1_re 118 14172.86
+# gllvm_null_model_lv2_re 156 14108.39
+
+AICc(gllvm_null_model_lv1_re, gllvm_null_model_lv2_re)
+# gllvm_null_model_lv1_re 14175.03 
+# gllvm_null_model_lv2_re 14112.19
+
+## AIC and AICc both suggest the lv2 is better although BIC suggests otherwise;
+## In addition, as a comparative with the 'null model' without RE, I'll select the 'lv2_re' model
+
+### Residual plots
+
+# pdf(file = "./results/gllvm_null-model-RE_lv2_residuals.pdf")
+# plot(gllvm_null_model_lv2_re, which = 1:4, mfrow = c(2,2))
+# dev.off()
+
+### Save the model
+# saveRDS(gllvm_null_model_lv2_re,
+#         file = "./results/gllvm_null-model-RE_lv2.rds")
+
+### You can load the files back instead of running the models again
+# gllvm_null_model_lv2_re <- readRDS("./results/gllvm_null-model-RE_lv2.rds")
+
+### Get LV values and arrange it in a dataframe to plot
+
+df_plot_null_model_lv2_re <-
+  cbind(wide_data,
+        as.data.frame(gllvm::getLV.gllvm(gllvm_null_model_lv2_re))) %>% 
+  dplyr::mutate(water_mass = factor(water_mass, levels = c("NW", "STW", "SASW")))
+
+## Plot colour-coded by 'water_mass' ----------------------------------------- #
+
+plot_null_model_watermass_re <- 
+  ggplot(
+    data = df_plot_null_model_lv2_re,
+    aes(x = LV1, y = LV2,
+        color = water_mass)) +
+  geom_point(alpha = 0.6) + 
+  scale_color_brewer(palette = "Dark2") +
+  xlab("Latent Variable 1") + ylab("Latent Variable 2") +
+  theme_bw() + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text = element_text(size = 12),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        legend.position = "bottom")
+
+ggsave(plot_null_model_watermass_re,
+       filename = "./results/gllvm_null-model-RE_lv2_biplot_watermass.pdf",
+       height = 9, width = 10, units = "cm", dpi = 300)
+
+## Plot colour-coded by 'season' --------------------------------------------- #
+
+plot_null_model_season_re <- 
+  ggplot(
+    data = df_plot_null_model_lv2_re,
+    aes(x = LV1, y = LV2,
+        color = season)) +
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = c("Summer" = "#4E79A7", "Autumn" = "#F28E2B", 
+                                "Winter" = "#E15759", "Spring" = "#76B7B2")) +
+  xlab("Latent Variable 1") + ylab("Latent Variable 2") +
+  theme_bw() + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text = element_text(size = 12),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        legend.position = "bottom")
+
+ggsave(plot_null_model_season_re,
+       filename = "./results/gllvm_null-model-RE_lv2_biplot_season.pdf",
+       height = 9, width = 10, units = "cm", dpi = 300)
+
+## Plot colour-coded by 'taiaroa_head' --------------------------------------- #
+
+# Specify a 12-colour palette
+palette_12cols <- colorRampPalette(RColorBrewer::brewer.pal(8, "BrBG"))(12)
+
+plot_null_model_taiaroa_re <- 
+  ggplot(
+    data = df_plot_null_model_lv2_re,
+    aes(x = LV1, y = LV2,
+        color = taiaroa_east)) +
+  geom_point(alpha = 0.6) + 
+  scale_color_manual(values = palette_12cols) +
+  xlab("Latent Variable 1") + ylab("Latent Variable 2") +
+  theme_bw() + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text = element_text(size = 12),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 9),
+        legend.position = "bottom")
+
+ggsave(plot_null_model_taiaroa_re,
+       filename = "./results/gllvm_null-model-RE_lv2_biplot_taiaroa.pdf",
+       height = 11, width = 11, units = "cm", dpi = 300)
 
 ## Unconstrained ordination, including predictors (Full model)) ####
 
@@ -551,7 +682,7 @@ gllvm_spp_ordered <- c(
   gllvm_spp[9], gllvm_spp[14], gllvm_spp[15], gllvm_spp[18], gllvm_spp[23], 
   gllvm_spp[32], gllvm_spp[28], gllvm_spp[7], gllvm_spp[34], gllvm_spp[10], 
   gllvm_spp[3], gllvm_spp[13], gllvm_spp[29], gllvm_spp[12], gllvm_spp[35], 
-  gllvm_spp[37], gllvm_spp[8], gllvm_spp[6], gllvm_spp[37], gllvm_spp[21], 
+  gllvm_spp[37], gllvm_spp[8], gllvm_spp[6], gllvm_spp[37], gllvm_spp[21], ###### ----- FIX gllvm_spp[37]
   gllvm_spp[4], gllvm_spp[11], gllvm_spp[5], gllvm_spp[1], gllvm_spp[19], 
   gllvm_spp[39], gllvm_spp[2], gllvm_spp[36], gllvm_spp[25]
 )
