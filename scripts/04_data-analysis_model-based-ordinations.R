@@ -682,7 +682,7 @@ gllvm_spp_ordered <- c(
   gllvm_spp[9], gllvm_spp[14], gllvm_spp[15], gllvm_spp[18], gllvm_spp[23], 
   gllvm_spp[32], gllvm_spp[28], gllvm_spp[7], gllvm_spp[34], gllvm_spp[10], 
   gllvm_spp[3], gllvm_spp[13], gllvm_spp[29], gllvm_spp[12], gllvm_spp[35], 
-  gllvm_spp[37], gllvm_spp[8], gllvm_spp[6], gllvm_spp[37], gllvm_spp[21], ###### ----- FIX gllvm_spp[37]
+  gllvm_spp[37], gllvm_spp[8], gllvm_spp[6], gllvm_spp[38], gllvm_spp[21], 
   gllvm_spp[4], gllvm_spp[11], gllvm_spp[5], gllvm_spp[1], gllvm_spp[19], 
   gllvm_spp[39], gllvm_spp[2], gllvm_spp[36], gllvm_spp[25]
 )
