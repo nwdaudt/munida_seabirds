@@ -274,7 +274,7 @@ gg_n_birds_season <-
                     name = NULL) +
   geom_hline(yintercept = overall_log10mean_n_birds_season,
              linetype = "longdash", colour = "grey50") +
-  xlab("") + ylab("Total number of birds\n(log10)") +
+  xlab("") + ylab("Maximum group size\n(log10)") +
   theme_bw() +
   theme(axis.text.x = element_blank(),
         axis.text = element_text(size = 10, colour = "black"),
@@ -343,7 +343,7 @@ gg_n_birds_taiaroa_east_season <-
                     name = NULL) +
   geom_hline(yintercept = overall_log10mean_n_birds_taiaroa_east,
              linetype = "longdash", colour = "grey50") +
-  xlab("") + ylab("Total number of birds\n(log10)") +
+  xlab("") + ylab("Maximum group size\n(log10)") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.text = element_text(size = 10, colour = "black"),
