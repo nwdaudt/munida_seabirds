@@ -17,47 +17,48 @@ Below, I provide a brief description underlying what each script does.
 These were the main scripts used for data wrangling and analyses (solid-line squares, in the figure above).
 
 * **'00': R environment**
-  - Sets up R environment by calling `renv::restore()`
+  - Sets up R environment by calling `renv::restore()`.
 * **'01': Tidy up raw data**
-  - Standardise and tidy up two sources of data (eBird and the [newly] digitised data)
-  - Merge these two [raw] "datasets" into the main one
+  - Standardise and tidy up two sources of data (eBird and the [newly] digitised data);
+  - Merge these two [raw] "datasets" into the main one.
 * **'02': Environmental data wrangling**
-  - Temperature and Salinity
-  - Water mass classification
-  - *Windstress data (ended up not using it)*
+  - Temperature and Salinity (**Figure S1**);
+  - Water mass classification;
+  - Windstress data (we ended up not using it).
 * **'03': Exploratory data analyses**
-  - Effort summary (**Table S1**)
-  - Number of occurrence per species
-  - Number of samples, by direction /5 km segment
-  - Number of species, by direction /5 km segment
-  - Number of species and total number of birds, by season (**Figure S2**)
-  - Number of species and total number of birds, /5 km segment, by season (**Figure 2**)
-  - Frequency of occurrence and numeric frequency, by season (**Figure 3**)
-  - *Frequency of occurrence and numeric frequency, by year (ended up not using it)*
-  - Percentage of each water mass, /5 km segment, by season (**Figure S1**)
-  - *Windstress class, by season (ended up not using it)*
+  - Effort summary (**Table S1**);
+  - Percentage of each water mass, for each 5 km segment, by season (**Figure S2**);
+  - Number of occurrence per species;
+  - Number of samples, by direction for each 5 km segment;
+  - Number of species, by direction for each 5 km segment;
+  - Number of species and maximum group size, by season (**Figure S3**);
+  - Number of species and maximum group size, for each 5 km segment, by season (**Figure 2**);
+  - Frequency of occurrence and numeric frequency, by season (**Figure 3**);
+  - Frequency of occurrence and numeric frequency, by year (we ended up not using it);
+  - Windstress class, by season (we ended up not using it).
 * **'04': Multivariate, model-based ordinations (GLLVMs)**
-  - Null models (**Figure 4; Figure S3**)
-  - Full models
-  - Predictor (covariate) selection (**Figure S4**)
-  - Coefficient plots (**Figure 5**)
-  - *Compare predictions based on the best full model with 0, 1 and 2 Latent Variables vs. raw data* [just another layer of validation, but I did not present it in the manuscript]
-* **'05': Univariate, Binomial GLMs**
-  - Yearly probability of occurrence, conditional to distance from coast (**Figure 6, 7**)
-  - Seasonal probability of occurrence, conditional to distance from coast (**Figure S5**)
+  - Fit null models (**Table S3; Figure S4; Figure 4**);
+  - Fit full models (**Table S3**);
+  - Compare predictions between GLLVMs accounting for predictors (full models), with and without LVs, and raw data [just another layer of validation, not presented in the manuscript];
+  - Covariate selection based on best full model (**Table S3**);
+  - Compare predictions between GLLVMs '~ distcoast', '~ distcoast + season', and raw data [just another layer of validation, not presented in the manuscript]  (**Figure S5**);
+  - Coefficient plots for the chosen best model including predictors (**Figure 5**).
+* **'05': Univariate, Binomial GLMM**
+  - Fit GLMMs;
+  - Nicely plot the coefficient and confidence intervals for Year for each species (**Figure 6**).
 
-The following scripts were part of exploratory data analysis and were not officially reported in the manuscript (dotted-line diamonds, in the figure above). **Note**: the data is not ideal to run these analyses, as briefly discussed under 'Limitations of the study' in the manuscript.
+The following scripts were part of exploratory data analysis and were not officially reported in the manuscript (dotted-line diamonds, in the schematic figure above). **Note**: the data is not ideal to run these analyses, as briefly discussed under 'Limitations of the study' in the manuscript.
 
 * **'06': ENSO**
-  - Summary of ENSO phases per year and voyages (**Figure S6**)
+  - Summary of ENSO phases per year and voyages (**Figure S6**).
 * **'07': Variograms**
-  - Spatial correlation among seabird observations for each species
+  - Spatial correlation among seabird observations for each species (check **`./results/variograms/`**).
 
 Script **'08'** is just an auxiliary script for exporting each of the **Figure 1** (study area) individual panels.
 
 ***
 
-Some figures were tiled together outside R (using [Inkscape](https://inkscape.org/) software), and were stored in `./rmd_tex/svg-figs/`. The (sub-)figures are all individual files from/in `./results/`. 
+**Figures 1, 4 and 5** were tiled together outside R (using [Inkscape](https://inkscape.org/) software), and were stored in `./rmd_tex/svg-figs/`. The (sub-)figures are all individual files stored at `./results/`. 
 
 **Figure 1** in the manuscript were built from script 08, and then edited in Inkscape. 
 
@@ -65,5 +66,4 @@ Some figures were tiled together outside R (using [Inkscape](https://inkscape.or
 
 ## Manuscript
 
-After running the above scripts, you will get all the results needed to compile the manuscript. The source `RMarkdown` file is in  `./rmd_tex/`. 
-
+After running the above scripts, you will get all the results needed to compile the manuscript. The source file for the manuscript is at `./rmd_tex/TeX/ms-ECSS.tex`. **Note:** to avoid repetition of files I have **not** copied all Figs to this directory (as Elsevier requests that figures are in the same directory as the TeX file) -- so you may need to do it yourself if you want to compile the exact PDF.
