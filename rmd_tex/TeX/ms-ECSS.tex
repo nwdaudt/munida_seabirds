@@ -1,0 +1,442 @@
+\documentclass[preprint, 3p, authoryear]{elsarticle} %review=doublespace preprint=single 5p=2 column
+%%% Begin My package additions %%%%%%%%%%%%%%%%%%%
+
+\usepackage[hyphens]{url}
+
+  \journal{Estuarine, Coastal and Shelf Science} % Sets Journal name
+
+\usepackage{lineno} % add
+  \linenumbers % turns line numbering on
+
+\usepackage{graphicx}
+%%%%%%%%%%%%%%%% end my additions to header
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \usepackage{fontspec}
+  \ifxetex
+    \usepackage{xltxtra,xunicode}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use microtype if available
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={},
+            pdftitle={Changing species occurrences in seasonal seabird assemblages at the Subtropical Frontal Zone},
+            colorlinks=false,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+
+\setcounter{secnumdepth}{5}
+% Pandoc toggle for numbering sections (defaults to be off)
+
+
+% tightlist command for lists without linebreak
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% From pandoc table feature
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+
+% Pandoc citation processing
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+% for Pandoc 2.8 to 2.10.1
+\newenvironment{cslreferences}%
+  {}%
+  {\par}
+% For Pandoc 2.11+
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+\usepackage{setspace}\doublespacing
+\usepackage{pdflscape}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\newcommand{\blandscape}{\begin{landscape}}
+\newcommand{\elandscape}{\end{landscape}}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+\begin{document}
+
+
+\begin{frontmatter}
+
+  \title{Changing species occurrences in seasonal seabird assemblages at the Subtropical Frontal Zone}
+    \author[MarSci-Otago,MatStat-Otago]{Nicholas W. Daudt%
+  \corref{cor1}%
+  }
+   \ead{nicholaswdaudt@gmail.com} 
+   
+    \author[OSNZ]{Graeme Loh%
+  %
+  }
+    \author[NIWA]{Kim I. Currie%
+  %
+  }
+    \author[MatStat-Otago]{Matthew R. Schofield%
+  %
+  }
+  
+    \author[MarSci-Otago]{Robert O. Smith%
+  %
+  }
+    \author[ASG]{Eric J. Woehler%
+  %
+  }
+    \author[FURG]{Leandro Bugoni%
+  %
+  }
+    \author[MarSci-Otago]{William J. Rayment%
+  %
+  }
+  
+    \affiliation[MarSci-Otago]{Department of Marine Science, University of Otago, Dunedin, Aotearoa New Zealand}
+    \affiliation[MatStat-Otago]{Department of Mathematics and Statistics, University of Otago, Dunedin, Aotearoa New Zealand}
+    \affiliation[OSNZ]{Ornithological Society of New Zealand, Dunedin, Aotearoa New Zealand}
+    \affiliation[NIWA]{National Institute of Water and Atmospheric Research, Dunedin, Aotearoa New Zealand}
+    \affiliation[ASG]{Australasian Seabird Group, BirdLife Australia, Hobart, Australia}
+    \affiliation[FURG]{Institute of Biological Sciences, Universidade Federal do Rio Grande -- FURG, Rio Grande, RS, Brazil}
+    \cortext[cor1]{Corresponding author}
+  
+  \begin{abstract}
+  Understanding the relationships between organisms and their environment is crucial to determining important areas for conservation and monitoring. In rapidly changing oceans, one approach to quantify these relationships is to identify species assemblages. This study used a nine year dataset of seabird observations sampled approximately every two months during a cross-shelf transect to describe assemblages at the Subtropical Frontal Zone, in southeast Aotearoa/New Zealand. During 36 voyages, 47 species and a minimum of 69,025 individual birds were recorded. We used multivariate, model-based ordinations to identify assemblages against spatial (distance from the coast), temporal (season) and environmental (water mass) predictors. The multivariate models suggest that the distance from the coast and seasons explain most of the observed variability. Gulls and shags influenced a coastal assemblage (<25 km from the coast), and most albatrosses and petrels were only recorded offshore (>35 km). Seasons strongly influenced the assemblages, with 31 of the 39 analysed species classified as migratory or dispersive. Over the nine year dataset, the probability of occurrence of nearly 40\% of the analysed species changed, indicating possible changes in the assemblage structure and species ranges. This study shows the importance of accounting for seasonality when describing assemblages in regions supporting high proportions of migratory and/or wide-ranging species. The observed changes in the probability of occurrence of several species may be the first evidence for the effects of oceanographic changes recently described for the southwest Pacific Ocean due to above-average warming caused by climate change.
+  \end{abstract}
+  \begin{keyword}
+    Albatrosses \sep At-sea surveys \sep Model-based ordination \sep Oceanography \sep Petrels \sep 
+    Phenology \sep Range shifts \sep Seasonality
+  \end{keyword}
+  
+ \end{frontmatter}
+
+\hypertarget{highlights}{%
+\section*{Highlights}\label{highlights}}
+\addcontentsline{toc}{section}{Highlights}
+
+\begin{itemize}
+\item
+  We described seabird assemblages at the Subtropical Frontal Zone off New Zealand
+\item
+  At coarse-scale, seabird assemblages did not correlate with water masses
+\item  
+  Seabird assemblages were mostly explained by season and distance from coast
+\item
+  High number of migratory and wide-ranging dispersive species were recorded
+\item
+  39\% of the analysed species changed their probability of occurrence over the years
+\end{itemize}
+
+\newpage
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+The occurrence of marine organisms is shaped by seascapes, with water masses as a key feature known to delimit habitats \citep{hunt1987, lalli1997}. The characteristic temperature and salinity profiles of water masses parallel terrestrial biomes, sustaining the fundamental environmental and biological conditions for organisms to survive. At the boundaries of water masses, different water densities coupled with physical processes may result in oceanographic fronts \citep[e.g.][]{collins2015}. Fronts are characterised by sharp horizontal and/or vertical gradients in water properties, such as temperature and salinity, that act as barriers to plankton and small nekton (e.g.~schooling fish, squid; \citet{olson1985}; \citet{bakun2006}). Water masses and fronts have commonly been used to explain biogeography and distribution patterns of marine organisms \citep{kinder1983, sournia1994, venables2012, scales2014, venkataramana2024}. Given these oceanographic features constrain the occurrence of prey for marine megafauna such as seabirds, the distributions of seabirds are therefore influenced by water masses \citep[e.g.][]{ribic1989, ribic2011, gall2022}.
+
+At the mega- (\textgreater3000 km) and macro-scales (3000--1000 km; \emph{sensu} \citet{hunt1987}), seabird species have been shown to associate with specific water masses and currents \citep[e.g.][]{wahl1989, gall2022, daudt2024, hyrenbach2007}. At the biogeographic level, for example, assemblages of seabirds associate with assemblages of their prey species off eastern Australia \citep{daudt2024, sutton2017}. However, at smaller spatial scales, e.g.~coarse-scale (1--100 km; \emph{sensu} \citet{hunt1987}), the distribution of seabirds is more likely to be influenced by prey availability \citep{hunt1987, weimerskirch2007, cox2018}. Seabirds are highly mobile animals, and are therefore less constrained by the boundaries of water masses while foraging. Given that the mechanisms driving prey aggregation are mostly physical at this spatial scale, temperature and/or salinity are typically used rather than water masses as independent predictors of seabird distribution \citep[e.g.][]{evans2021, cushing2024}. However, spatial mismatches between fronts and the peak of prey abundance are likely to occur due to lags in the physical and biological processes driving front formation and prey aggregation rates \citep{franks1992, odriscoll1998}. Therefore, the spatial relationships among oceanographic features, aggregations of prey and the distributions of seabirds may be challenging to define \citep{russell1999, gremillet2008}.
+
+One approach to understand the influence of environmental characteristics, such as water masses, on marine organisms is to identify species assemblages. Assemblages are groups of related taxa sharing space and time \citep{stroud2015}; consequently, they also experience the same environmental conditions. As such, assemblages can be used to monitor environmental changes \citep{ferrier2002, woolley2020}. In recent decades, the global marine environment has experienced ocean warming, and the trend is for temperatures to continue increasing \citep{cheng2022}. As a response, species assemblages are restructuring \citep{antao2020, bernardo2024, leluherne2024} as seabirds' distributions alter in response \citep{peron2010, sojitra2022}. Seabirds, which are among the easiest taxa to detect at-sea \citep{ballance2007} and may be used as surrogates to study the distribution of highly mobile species \citep{daudt2024}, could help our comprehension of associations between marine megafauna and environmental characteristics. Although advances in remote-sensing technologies allow us to identify variations in the physical environment, the quantification of assemblages of seabird species is a promising tool for ground-truthing these changes \citep{gremillet2009}.
+
+Aotearoa/New Zealand hosts the highest diversity of seabird species globally \citep{karpouzi2007, ramirez2017}, and is believed to be the evolutionary origin of Procellariiformes (albatrosses and petrels) \citep{chown1998}. This diversity reflects the wide environmental gradients and diverse marine habitats within the country's marine and terrestrial territories, from mid- (Rangitāhua/Kermadec Islands at 29°S) to high latitudes (Motu Ihupuku/Campbell Island at 52°S). Despite the at-sea distribution of several seabird species being revealed through bio-logging in recent years \citep[e.g.][]{shaffer2006, rayner2011, thompson2021, fischer2023}, many more still need to be studied \citep{bernard2021}. Our understanding of the drivers of species' distributions continues to be hampered by the lack of quantitative at-sea survey data \citep{mott2018}. This is particularly the case at the assemblage level for New Zealand seabirds.
+
+Unlike their planktonic and nektonic prey, seabirds are highly mobile animals. Even during the breeding period when seabirds are constrained as central-place foragers, some species perform daily foraging trips of hundreds of kilometres \citep{mcduie2015, patterson2022}. Outside their breeding periods, many species make extensive post-breeding dispersions or migrations. Seasonal movements are likely to affect the structure of seabird assemblages at sea, irrespective of the breeding status of the individuals. Dispersive species often do not have well-defined seasonal movements, but search for food widely. Examples are the northern giant petrel \emph{Macronectes halli} that breeds in the Subantarctic islands of New Zealand, but subsequently disperses to the west coast of South America, and may even circumnavigate the Southern Ocean \citep{woehler1988, quinones2021}, and the Cape petrel \emph{Daption capense} that breeds in Antarctica, then forages throughout Australasia up to \textasciitilde25°S \citep{hanzab2023}. Conversely, migratory seabird species fly to specific wintering areas seasonally. Perhaps the most iconic migratory species is the sooty shearwater \emph{Ardenna grisea} that migrates to the North Pacific Ocean after breeding in southern New Zealand during the summer \citep{shaffer2006}.
+
+In this study, we investigate a nine year dataset (2015--2023) of seabird observations collected on bi-monthly surveys during a 60 km cross-shelf transect to describe the observed assemblages of species off southeast New Zealand. Earlier studies described the distributions of seabirds in this region, but were all conducted \textless15 km from the coast \citep{mcclatchie1989, hawke1991, odriscoll1998a, odriscoll1998b, bourke2024}. An important feature of the survey is that the transect consistently samples three water masses. Previous studies have shown that these water masses affect the structure of assemblages of plankton and bacteria \citep{baltar2016, jones2013, adams2023}. Thus, using \emph{in situ} seabird observations from these voyages is an excellent opportunity to test whether seabird occurrence responds to surface water masses at coarse-scales. In addition, we examined the nine year time series for evidence of temporal (i.e.~seasonal and yearly) changes in the probability of occurrence of seabird species. Specifically, we aimed to test (1) whether water mass influenced assemblages of seabirds at coarse spatial scale, (2) how seasons influenced assemblages of seabirds, and (3) if species' probabilities of occurrence were changing over time. In light of the above, we expect to find that both water mass and season drive the structure of assemblages of seabird species. Given the oceanographic characteristics off eastern New Zealand are changing \citep{sutton2024}, we would expect that seabird distributions are likely adjusting in response; as such, we anticipate detecting changes in species' probabilities of occurrences over the years.
+
+\hypertarget{methods}{%
+\section{Methods}\label{methods}}
+
+\hypertarget{study-area}{%
+\subsection{Study area}\label{study-area}}
+
+The Munida transect is a 60 km oceanographic transect that has been sampled approximately every two months since 1998 \citep{currie2011}. It starts from Taiaroa Head (Muaūpoko/Otago Peninsula) and extends offshore towards the east-southeast (Fig. \ref{fig:figstudyarea}). The Munida transect was established to primarily monitor ocean acidification and dissolved inorganic carbon (DIC) levels in the South Pacific Ocean \citep{currie2011}. In addition, the Munida transect has supported collection of a range of oceanographic and biological data \citep[e.g.][]{jones2013, baltar2016, adams2023, johnson2024}. Biological samples are obtained on the outbound leg with vertical profiles of oceanographic parameters generally sampled at a maximum of nine stations \citep{jones2013, johnson2023}. On the inbound leg, the vessel steams at a steady 8 kn (\textasciitilde15 km.h\textsuperscript{-1}), with a continuous surface (\textasciitilde2 m depth) profile of the oceanographic parameters (temperature and salinity) and DIC samples obtained \citep{currie2011}.
+
+\begin{figure}
+\centering 
+\includegraphics[width=1\linewidth]{./study-area.pdf}
+\caption{Study area and its oceanographic setting. (A) The average position of the Subtropical Front (STF) and Southland Current (SC) off Aotearoa/New Zealand (adapted from Shaw and Vennell, 2001); the red polygon indicates the Munida transect. (B) The Taiaroa Head location, off Muaūpoko/Otago Peninsula, and the schematic position of the three water masses sampled by the Munida transect---Neritic Water (NW), Subtropical Surface Water (STW) and Subantarctic Surface Water (SASW). (C) The Munida transect split into 12 equal-length 5 km segments where seabird data were recorded}
+\label{fig:figstudyarea}
+\end{figure}
+
+A unique feature of the Munida transect is that it consistently samples across three surface water masses (Fig. \ref{fig:figstudyarea}{B}): Neritic Water (NW), Subtropical Surface Water (STW) and Subantarctic Surface Water (SASW). Neritic Water is a product of mixed STW with continental freshwater run-off \citep{jillett1969, johnson2024}; NW is often less saline, warmer in summer, and cooler in winter than STW \citep{jillett1969}. Subtropical Surface Water is more saline and warmer than the offshore SASW, creating a thermosaline gradient between these water masses. The Munida transect also crosses the Southland Front (SLF) \citep{jillett1969, shaw2001, chiswell2015}, a local expression of the global Subtropical Front (STF), which separates STW and SASW. The SLF is oriented southwest-northeast off the Otago coast, and is bathymetrically steered along the upper continental slope of southern New Zealand \citep{shaw2001, smith2013}. Associated with the SLF and offshore SASW is a northeast flowing boundary current known as the Southland Current (SC) \citep{sutton2003}. Although the SLF is relatively stable in position on seasonal to interannual timescales \citep{hopkins2010}, its identification is not always straightforward when using surface data. The mixing dynamics between NW and STW, and the seasonality of heating or cooling, can make it challenging to detect when using sea surface temperatures \citep{jones2013, johnson2024}. However, the average position of the SLF is about 30 km offshore (at about the 500 m isobath), varying seasonally from 25--55 km \citep{hopkins2010, jones2013}.
+
+\hypertarget{data}{%
+\subsection{Data}\label{data}}
+
+\hypertarget{data-collection}{%
+\subsubsection{Data collection}\label{data-collection}}
+
+Seabird observations were undertaken during voyages of the Munida transect onboard the RV \emph{Polaris II} (eye height \emph{c.} 6 m a.s.l.) by one of the authors (GL) from 2015 to 2023. The main transect was split into 12 equal-length 5 km segments (Fig. \ref{fig:figstudyarea}{C}). For each of these 5 km segments, the maximum number of individuals seen at a single time (MaxN) per species was recorded during both the outbound and inbound legs of the transect. No predetermined maximum distance from the vessel was set, but observations were mostly made within 500 m of the vessel. Birds were detected by the naked eye and identified using binoculars and photographs (DSLR camera with a 200 mm lens). While waiting at stations during the outbound leg, birds were also recorded in a separate sheet; these data were not used in this study. The survey effort was halted when conditions were too rough, i.e.~swell higher than 2.5 m and/or winds stronger than 20--25 kn (\textasciitilde37--46 km.h\textsuperscript{-1}). The vessel always departed from the harbour at 06:00 h local time, which precluded counting birds for the first few 5 km segments in some voyages due to lack of daylight (especially in winter). 
+
+We acknowledge that the observations were made using an uncommon method for recording seabirds at sea. The dataset can be viewed as a citizen science project \citep{dickinson2010, peters2015}, given that the primary observer (GL) collected data systematically using their methodology. As such, this is an opportunistic \emph{post-hoc} analysis to maximise the information collected on the cruises. The MaxN method is commonly used in other disciplines such as underwater visual census of fish \citep{whitmarsh2017, schmid2017, mitchell2021, lima2025}, and provides reliable relative abundance measurements to describe assemblages \citep{willis2000, harvey2007}. Although this method was not designed for studying seabirds at sea, studies elsewhere have used similar approaches, such as `daily total number of birds' when using citizen science data \citep[e.g.][]{gorta2019, martin2020}. We choose not to clump the data into a single measurement of daily counts, as it would preclude any spatial analysis.
+
+Due to difficulties in species identification, we pooled observations of Hutton's (\emph{Puffinus huttoni}) and fluttering shearwaters (\emph{P. gavia}) as ``Hutton's/fluttering shearwater'', and of Antipodes (\emph{Diomedea antipodensis}), Gibson's (\emph{D. gibsoni}) and wandering albatrosses (\emph{D. exulans}) as ``wandering albatross'' (``\emph{D. {[}exulans{]}}'').
+
+To identify water masses, we used \emph{in situ} measurements of sea surface temperature (SST; °C) and salinity (SSS; PSU) collected whilst underway by a Sea-Bird SBE21 thermosalinograph supplied by the ship's intake located approximately 2 m below the surface \citep{jones2013}.
+
+\hypertarget{data-treatment}{%
+\subsubsection{Data treatment}\label{data-treatment}}
+
+Seasons were defined as summer (01 January--31 March), autumn (01 April--30 June), winter (01 July--30 September), and spring (01 October--31 December).
+
+The SST and SSS data were averaged in space within each 5 km segment to correspond with seabird observations and identify the extents of water masses present along the transect (Supplementary Material Fig. S1). Due to the large seasonal and interannual variability in SST that can be present in NW and STW \citep{shaw2001, jones2013, stevens2021}, we used SSS and distance from coast (km) to identify each water mass present in each 5 km segment. Water masses were classified as follows: \textgreater34.6 PSU as STW, \textless34.6 PSU and \textless20 km from the coast as NW, and \textless34.6 PSU and \textgreater20 km from the coast as SASW \citep{jillett1969, stevens2021, johnson2024}. These are well-established water mass criteria for the region, first developed by \citet{jillett1969} and utilised by several studies \citep{currie1999, shaw2001, hopkins2010, jones2013, johnson2024}.
+
+For the descriptive summaries mentioned in Section \ref{statisticalanalyses} (below), all data were used. For modelling, we only used the data from the inbound leg to remove potential bias associated with seabirds gathering around the vessel during sampling stops, and to overcome the winter gaps at the start of the outbound leg when darkness prevented observations. Although this may not exclude biases associated with ship-following behaviour of some species \citep[e.g.][]{griffiths1982, hyrenbach2001}, the maximum count method helped to minimise the use of double-counts. Two out of 36 voyages had no data on salinity due to a malfunction of the thermosalinograph; consequently, there were no data on water masses either. Therefore, these two voyages were excluded before modelling. In addition, we only incorporated data from species occurring in at least three 5 km segments for the modelling.
+
+\hypertarget{statistical-analyses}{%
+\subsection{Statistical analyses}\label{statisticalanalyses}}
+
+Data wrangling, modelling and visualisation were done in R 4.2.0 \citep{rcoreteam}, mainly using the \texttt{gllvm} 2.0.2 \citep{niku2019} and base \texttt{stats} packages for analyses, and the \texttt{ggplot2} 3.4.4 \citep{ggplot2} package for plotting (the full list of packages used can be found in the Supplementary Material). The data and code supporting our findings are openly available \citep{daudt_data_2024}. The mathematical notation of the models below follow the notation proposed by \citet{edwards2019}, where normal symbols represent single values and bold symbols represent vectors.
+
+Boxplots were used to visualise species richness and maximum number (MaxN) of seabirds for each 5 km segment, categorised by season for the nine years. The frequency of occurrence of each species (percentage of voyages that the species was present) and relative abundance (percentage of each species relative to the sum of all maximum group numbers of seabirds) were plotted using barplots for each season. In addition, we calculated the percentage occurrence of water masses across the 5 km segments for each season for the nine years.
+
+To identify assemblages of seabird species, we specified generalised linear latent variable models (GLLVM) \citep{hui2015, niku2019}. As model-based ordinations, GLLVMs provide several advantages over classic distance-based approaches \citep{warton2012, warton2015}, including residual-based model checking and model selection using standard metrics, such as the Bayesian Information Criterion (BIC). To account for the known overdispersion in datasets, typical of at-sea counts of seabirds \citep{gall2022, sojitra2022, linden2011}, we modelled counts per species using a negative binomial distribution. All models were fit using the \texttt{gllvm::gllvm()} function, using the Laplace approximation method. First, we specified a null model to explore the (dis)similarity among observations. The specified model was
+
+\[
+log(\mu_{ij}) = \alpha_i + \beta_{0j} + \mathbf{u_i}^\top \mathbf{\gamma_j},
+\]
+
+\noindent
+where the mean of the \(j\)th species in the \(i\)th 5 km segment (site) is related to segment-specific latent variables \(\mathbf{u_i}\). Each species is related to the latent variables through estimated coefficients in the vector \(\mathbf{\gamma_j}\). Latent variables can be interpreted as axes from classic ordinations \citep{niku2019}. In the null model, we expect the latent variables \(\mathbf{u}\) to reflect dominant sources of common variability, indicating assemblages by grouping sites where species composition responds similarly to the variability. The \(\alpha_i\) and \(\beta_{0j}\) are site-specific and species-specific intercept parameters, respectively. We compared the BIC for models with 1 or 2 latent variables, choosing the model with the lowest BIC.
+
+We then constructed models including latent variables and one or more predictor variables; water mass (as a categorical predictor), season (as categorical) and distance from coast (as continuous). Although we used distance from coast as categorical to calculate summaries, preliminary models specified using distance from coast as a categorical predictor had higher BIC values and did not improve model fit when checking their residual plots. For simplicity therefore, only models using distance from coast as a continuous variable were fitted. The continuous values were assigned as the distance from Taiaroa Head to the centroid of each 5 km segment (in km). The specified model was
+
+\[
+log(\mu_{ij}) = \alpha_{V_i} + \beta_{0j} + \mathbf{x_i}^\top \mathbf{\beta_j} + \mathbf{u_i}^\top \mathbf{\gamma_j},
+\]
+
+\noindent
+that included the term \(\mathbf{x_i}^\top \mathbf{\beta_j}\), related to the predictors. In this model, \(\mathbf{x_i}\) represents predictor values for each observation and \(\mathbf{\beta_j}\) is a vector of species-specific coefficients related to predictors. By definition, the latent variables \(\mathbf{u_i}\) of this model capture the covariance of the relative abundance data among sites (5 km segments) after controlling for predictors \citep{niku2019}. We compared the models with 0, 1 or 2 latent variables, choosing the `full model' that minimized the BIC. In addition, as predictors and relative abundance covariance were expected to be similar within the same voyage, instead of modelling a site-specific term (as in the null model), we included a voyage-specific random effect, \(\alpha_{V_i}\), where observations were grouped given \(V_i = (1, ..., 34)\); the random effect was assumed to be normally distributed, \(\alpha_{V_i} \sim N(0, \sigma^2)\). After selecting the best number of latent variables, the best set of predictors was selected based on the model with the lowest BIC and complementary model checks (see Results).
+
+To interpret the results from GLLVMs, we created ordination plots for the null models, colour-coded by the possible predictors. The results from the model with predictors were analysed by means of coefficient plots, through the \texttt{gllvm::coefplot()} function.
+
+To test for changes in probabilities of occurrence of each species (\(Y\)) among years, we specified univariate binomial generalised linear mixed models (GLMM). To use the same modelling approach, we specified a GLLVM with zero latent variables. If the latent variable term \(\mathbf{u_i}\) is not included, the GLLVM collapses back to an ordinary GLMM \citep{warton2015}. The specified model was
+
+\[
+Y \sim Binomial(n, \theta),
+\]
+
+\noindent
+where \(\theta\) is the parameter of interest and \(n\) is the number of trials (i.e.~the number times a specific 5 km segment was surveyed). We used the logit link function to relate \(\theta\) to the linear predictor \(\eta\), which took the following form
+
+\[
+logit = log(\frac{\theta}{1-\theta}),
+\]
+
+\[
+logit(\theta) = \eta = \alpha_{V_i} + \beta_{0j} + \mathbf{x_i}^\top \mathbf{\beta_j},
+\]
+
+\noindent
+where the probability of occurrence \(\theta\) is a function of the distance from coast (continuous, as in the GLLVMs) and year (as a numeric predictor). The parameters \(\alpha_{V_i}\) and \(\beta_{0j}\) are the same as described above.
+
+The estimated coefficients and their 95\% confidence intervals for the \(year\) parameter for each species were then extracted from this model. We then classified the species regarding changes in their probabilities of occurrence over time. Following \citet{muff2022}, we report p-values as suggesting `no' ($p \textgreater0.5$), `little' ($0.5\geq p \textgreater0.1$), `weak' ($0.1\geq p \textgreater0.05$), `moderate' ($0.05\geq p \textgreater0.01$), `strong' ($0.01\geq p \textgreater0.001$), or `very strong' ($p \leq0.001$) evidence that \(year\) affects \(\theta\). Effects classified as `weak' or stronger were assumed to suggest changes in the probability of a species' occurrence over time.
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+In total, 36 voyages were undertaken in nine years, recording and a minimum of 69,025 individual birds from 47 species, of which 39 occurred in at least three segments (Supplementary Material Tables S1, S2). The percentage of times that a water mass was present in each 5 km segment showed NW close to shore, SASW offshore, and STW in between those water masses, but with seasonal variability. During summer, STW was more frequently present in coastal segments (0--10 km from Taiaroa Head) compared to other seasons. STW even extended out to the end of the transect (i.e.~60 km offshore) in a voyage during spring 2020. During winter and spring, the SASW penetrated more frequently into the 20--35 km segments (Supplementary Material Fig. S2).
+
+Seabird species richness and relative abundance tended to be higher during spring and summer and lower in autumn and winter (Supplementary Material Fig. S3). The mean (and median) species richness was 19 species per voyage, ranging from nine to 29. When plotting these data along the transect, a peak in richness during summer and spring was present between 25--40 km offshore (Fig. \ref{fig:figboxplots}{A}). In addition, a decreasing gradient in relative abundance with increasing distance offshore was evident in all seasons (Fig. \ref{fig:figboxplots}{B}). Frequencies of occurrence revealed that 11 species had high frequencies ($\geq50$\%) in all seasons, i.e.~they were commonly observed throughout the year, although with inter-seasonal variation (Fig. \ref{fig:figfofn}{A}); another 11 species were commonly observed ($\geq50$\%) in at least two seasons. The relative abundance data showed the numeric dominance of the sooty shearwater in summer and spring, Cape petrel in winter, and highlighted the red-billed gull \emph{Chroicocephalus novaehollandiae} as an abundant resident species throughout the year, especially during autumn (Fig. \ref{fig:figfofn}{B}).
+
+\begin{figure}
+\centering 
+\includegraphics[width=1\linewidth]{./EDA_spp-richness_n-birds_taiaroa-east.pdf}
+\caption{Variation in species richness (A) and the sum of maximum group sizes (B) for each 5 km segment and season, off Taiaroa Head, Aotearoa/New Zealand, for 2015--2023. Values in the x-axis represent distance from the coast. Note that values in B are log10-transformed. Black dots are boxplot outliers and the grey dashed line represents the overall mean along the main transect}
+\label{fig:figboxplots}
+\end{figure}
+
+\begin{figure}
+\centering 
+\includegraphics[height=20cm]{./EDA_sp_frqs-occ-num-season.pdf}
+\caption{Seasonal (A) frequencies of occurrence (percentage of the number of voyages that the species was present) and (B) relative abundances (percentage of the number of individuals of each species by the total number of individuals recorded within each season) of seabirds off Taiaroa Head, Aotearoa/New Zealand, for 2015--2023. See Table S2 for scientific names}
+\label{fig:figfofn}
+\end{figure}
+
+The best GLLVM null model retained two latent variables (Supplementary Material Table S3), and had no apparent deviation from the model assumptions (Supplementary Material Fig. S4). When colour-coding the observations in the ordination plot, observations in NW tended to group together towards the positive values of the Latent Variable 1 in the ordination, while observations in STW and SASW largely overlapped (Fig. \ref{fig:figgllvmnull}{A}). Distance from coast tended to have a stronger effect on coastal segments (darker brown in Fig. \ref{fig:figgllvmnull}{B}), with observations in the middle-to-offshore segments overlapping (Fig. \ref{fig:figgllvmnull}{B}). In contrast, seasonal assemblages of seabird species were clear, with spring/summer and autumn/winter distinguishable into two groups (Fig. \ref{fig:figgllvmnull}{C}). Overall, the first axis of the ordination mainly explained the assemblages based on the distance from coast, whereas the second axis explained the seasonal variability.
+
+\begin{figure}
+\centering 
+\includegraphics[height=20cm]{./gllvm-null-rev.pdf}
+\caption{Ordination plots based on the null generalised linear latent variable model using relative abundance data of seabirds off Taiaroa Head, Aotearoa/New Zealand, for 2015--2023, colour-coded by (A) water mass, (B) distance from the coast and (C) season}
+\label{fig:figgllvmnull}
+\end{figure}
+
+The best GLLVM including predictors retained one latent variables. Models including only distance from the coast and distance from the coast plus season explained the data equally well (<\(\Delta3\) BIC), indicating they accounted for the majority of the variation in the data. After checking these models predictions and estimated coefficients, we chose to present data from the model including both predictors, as this model allows quantitative assessment of the effects of seasonality on species assemblages. The model residuals did not show any deviation from the assumptions (Supplementary Material Fig. S5). Coefficient plots showed that some species had higher numbers in inshore waters, such as the spotted \emph{Phalacrocorax punctatus} and Otago \emph{Leucocarbo chalconotus} shags and the black-billed \emph{C. bulleri} and red-billed gulls (Fig. \ref{fig:figgllvmpredictors}{A}). Others such as the grey petrel \emph{Procellaria cinerea}, white-headed petrel \emph{Pterodroma lessonii} and wandering albatross had higher numbers in offshore waters (Fig. \ref{fig:figgllvmpredictors}{A}). Seasonal effects on species numbers can be seen from both the modelling output (Fig. \ref{fig:figgllvmpredictors}{B}) and descriptive analyses (Fig. \ref{fig:figfofn}). The seasonality of species occurrence was intrinsically linked to their breeding periods and migratory status (Supplementary Material Table S2); 31 of the 39 species observed were classified as migratory or dispersive.
+
+\begin{figure}
+\centering 
+\includegraphics[width=1\linewidth]{./gllvm-predictors.pdf}
+\caption{Coefficient plots based on the best fit generalised linear latent variable model with predictors, using relative abundance data of seabirds off Taiaroa Head, Aotearoa/New Zealand, for 2015--2023. The effects of (A) distance from coast and (B) season are shown for each species. With season as a categorical predictor, all values in (B) are in reference to summer (used as the intercept). Crosses represent the mean estimated coefficient, and horizontal lines their confidence interval (CI); black symbols represent estimates that are significant (do not include zero in their CI). Note that in (B), CIs are small values for many species and therefore hard to see at this scale. See Supplementary Material Table S2 for scientific names}
+\label{fig:figgllvmpredictors}
+\end{figure}
+
+The GLMM models including year and distance from coast as predictors revealed varied responses for the probability of species' occurrences over the nine years (2015--2023). From the 11 species observed year-round, 10 had stable probability of occurrence over the study period and one increased (black-backed gull \emph{Larus dominicanus}). In total, however, 15 species (39\%) showed signs of change in their probabilities of occurrence (\ref{fig:glmmyearcoef}). From these, 9 species (60\%) breed on the Subantarctic islands or on the Antarctic Continent, and were all increasing their probability of occurrence. In contrast, the probability of occurrence of the mottled petrel \emph{Pterodroma inexpectata} decreased.
+
+\begin{figure}
+\centering 
+\includegraphics[scale=0.8]{./GLMM_gllvm-lv0-Binomial_spp-year-coeff-CIs-mako.pdf}
+\caption{Evidence for detecting changes in species probabilities of occurrence related to the year, based on the binomial generalised linear mixed models accounting for the distance from the coast. The dot represents the estimated parameter and the bars its 95\% confidence interval (CI); colours are related to the strength of evidence that the p-value suggests (see Methods). The model did not fit well for Cook's petrel; therefore, we have omitted this species in this plot. In brackets after the species common name, the labels indicate the distribution status according to \citet{williams2006}; distribution are coded as migratory (M), dispersive (D), or sedentary (S), followed by their geographic range North Pacific (NP), South Pacific (SP), Eastern Pacific (EP), South Atlantic (SA), circum-polar Southern Ocean (SO), Tasman Sea/Australian coast (TS/A), and southwest Pacific (SWP). Sedentary species remain within New Zealand territory year-round. See Supplementary Material Table S2 for scientific names}
+\label{fig:glmmyearcoef}
+\end{figure}
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+In this study, we analysed nine years of relative abundance and occurrence data of seabirds in a highly diverse region off southern Aotearoa/New Zealand in relation to year, season, water mass and distance from coast along a fixed 60 km transect. Gulls and shags influenced a coastal assemblage (\textless25 km from the coast), whereas most albatross and petrel species only occurred in offshore waters (\textgreater35 km). However, contrary to expectations, the distribution of the assemblages in our study did not appear to be related to water mass. The assemblages of seabird species were mostly influenced by season, and the majority of the recorded species were migratory or wide-ranging dispersive. Through the years, the probability of occurrence changed for approximately 40\% of the species examined in this study, potentially indicating early signs of changes in the assemblage structure and species' at-sea ranges.
+
+The analyses presented here are the first of dedicated ship-based, systematic data on seabird distributions off the southeast New Zealand continental shelf. Earlier studies reported occasional records \citep[e.g.][]{hicks1973, jenkins1984} and/or were confined to coastal waters. The most frequent coastal species recorded in this study were the same as previously reported (red-billed, black-billed and black-backed gulls, white-fronted tern \emph{Sterna striata} and Otago shag), and the typical oceanic species that are frequently seen in coastal waters off Otago Peninsula, such as the sooty shearwater, Cape petrel, Buller's \emph{Thalassarche bulleri} and white-capped \emph{Thalassarche steadi} albatrosses \citep{mcclatchie1989, hawke1991, odriscoll1998a, odriscoll1998b, bourke2024}. Unlike these earlier studies, we did not record typical coastal species such as the spotted shag, blue penguin \emph{Eudyptula minor} and Hutton's/fluttering shearwater in high numbers, likely because these species spend considerably more time in coastal, rather than offshore waters. Data examined in this study were largely obtained off the continental shelf, and consequently recorded more offshore species, such as the \emph{Diomedea} albatrosses, \emph{Pterodroma} petrels and storm-petrels. Interestingly, northern royal albatross \emph{D. sanfordi}, which has an increasing population breeding at Taiaroa Head \citep{richard2015}, located close to the start of the transect, were not present in high numbers along the transect. Adults from this colony appear to prefer feeding in waters closer to the Chatham Rise (\emph{c.} 44°S) or farther offshore, while post-fledging juveniles fly east to South America \citep{nicholls1994, thomas2010}. Some species seem to be naturally sparse in the region (e.g.~skuas), but overall, the remarkably high average species richness for a relatively short transect (60 km) is noteworthy, and likely reflects the oceanography of the area.
+
+\hypertarget{role-of-oceanography-on-observed-seabird-species-and-assemblages}{%
+\subsection{Role of oceanography on observed seabird species and assemblages}\label{role-of-oceanography-on-observed-seabird-species-and-assemblages}}
+
+The results presented here are consistent with previous studies elsewhere that seabirds aggregate at oceanographic fronts. When comparing within seasons, the boxplots showed slightly higher numbers of individuals and species richness in segments between 25--40 km off the coast, the average location of the Southland Front \citep{hopkins2010, jones2013}. In addition, the segments 5--15 km from the coast also supported high numbers of individuals and species, particularly in spring. This is the region most influenced by freshwater from the nearby Clutha River \citep{johnson2024}, which can create salinity and/or ocean colour fronts at the NW and STW boundary.
+
+Freshwater plumes can create oceanographic features facilitating seabird feeding \citep{zamon2003, phillips2018, daudt2019}. However, in coastal waters off Taiaroa Head, previous studies by \citet{mcclatchie1989} and \citet{odriscoll1998a} reported weak fine-scale effects of oceanography on the distributions of seabirds. Additionally, strong associations between seabird numbers and freshwater plumes and fronts have not been found in New Zealand \citep{mcclatchie1989, odriscoll1998a, hawke1996}. However, \citet{odriscoll1998} showed that peak densities of plankton may have spatial mismatches compared to oceanographic fronts. The mismatch of the spatial scales of sampling for seabirds, prey and oceanographic data, as noted by \citet{odriscoll1998a}, might be one of the factors influencing the weak correlation found in previous studies. The fine-scale relationship among seabirds, oceanography and prey in the region requires further study to understand these relationships. Nonetheless, at a coarse-scale, the results of our study showed that the mean positions of water mass boundaries and associated fronts visually agreed with observations of higher numbers of species and individuals.
+
+There was no relationship between the assemblages of seabirds and the three water masses along the transect in this study. \citet{ribic1997} did not find a relationship between seabirds and water masses in the Equatorial Pacific Ocean, although they noted an association with local currents. Other studies that found no association between seabirds and water masses suggested that this may be related to prey availability \citep[e.g.][]{haney1986, elphick1993}. We suspect that dynamics of the boundaries between water masses are the key to understanding their influence at the spatial scale of our study. \citet{elphick1993} suggested that the gradient of the boundary may influence the ability of seabirds to differentiate between habitat patches (water masses). Other authors have demonstrated the fuzziness of the relationship between water mass boundaries and assemblages of seabirds---i.e.~the overlap of species occurrences and gradual change in relative abundances across adjacent water masses \citep{wahl1989, hay1992}. These transition zones between assemblages can extend over relatively large areas, even larger than our entire study area \citep[e.g.][]{spear2001, daudt2024}.
+
+Off Taiaroa Head (the start of the Munida transect), several factors contribute to the variability in front and water mass distribution, with local wind forcing playing a significant role. For instance, southwesterly winds, which blow ``downfront'' along the STF in this region, mix the entire water column over the shelf and push SASW inshore by \textasciitilde10 km \citep{johnson2023}. In contrast, northerly winds create a stratified water column and push NW and/or STW offshore by \textasciitilde10 km \citep{johnson2023}. The strength and direction of the local wind forcing can also influence whether NW extends offshore and above STW to impact the Subtropical Front, or stays confined inshore \citep{johnson2024}. The presence of large, wind-forced sub-seasonal variability in the position of the Subtropical Front and water masses in the region \citep{johnson2023, johnson2024}, may therefore explain the lack of relationship between assemblages of seabirds and water masses in this study.
+
+\hypertarget{role-of-season-on-observed-seabird-species-and-assemblages}{%
+\subsection{Role of season on observed seabird species and assemblages}\label{role-of-season-on-observed-seabird-species-and-assemblages}}
+
+Regardless of the role of the physical environment on the distribution of seabirds, a strong effect of season was evident in driving assemblage structure in this study. This is not surprising as \textasciitilde80\% of the species recorded in the area are seasonally migratory or wide-ranging dispersive. Sooty shearwaters leave their New Zealand colonies and migrate to the North Pacific Ocean \citep{shaffer2006}, while Salvin's albatrosses \emph{T. salvini} and South Island Cook's petrels \emph{P. cookii} migrate to the Eastern Pacific Ocean off the coast of South America \citep{rayner2011, fischer2023}. These species are simply not present in large numbers around New Zealand while on their non-breeding journey.
+
+Although wide-ranging species are not absent from the study region, they might have different habitat preferences depending on their life history stage, potentially affecting the assemblage structure. The at-sea distribution of Campbell albatross \emph{T. impavida} ranges from \emph{c.} 10--65°S \citep{thompson2021}, but during May--July individuals preferentially use warmer waters north of 40°S. The results of this study support this pattern, as fewer Campbell albatrosses were observed during winter surveys. Seasonal variations in the occurrence of species led to different assemblage structure, as found elsewhere \citep{renner2008, hunt2014, simon2024}. It is clear that when surveying regions with high proportions of migratory and/or wide-ranging dispersive species, the seasonality of the species will influence the composition of assemblages.
+
+\hypertarget{changes-in-seabirds-probabilities-of-occurrence}{%
+\subsection{Changes in seabirds' probabilities of occurrence}\label{changes-in-seabirds-probabilities-of-occurrence}}
+
+Over the course of the nine years of this study, we detected changes in the probability of occurrence of \textasciitilde40\% of the analysed species. Sedentary, resident species such as black-billed gull became more frequent, which may be related to possible population increase \citep{mischler2018}. However, the probability of occurrence of other resident species such as red-billed gull were stable, despite their local population increasing \citep{perriman2012}. Although population numbers may not be well correlated with probabilities of occurrence, species with small population sizes are likely to have lower detection probabilities \citep{mccarthy2013}. The probability of occurrence of red-billed gulls, in contrast, might be reflecting their temporal consistency in habitat selection. Very few detailed studies have been conducted on the spatio-temporal movements for many of the resident species recorded in this study. Understanding their habitat use and associated temporal changes, is therefore crucial to better interpret these results.
+
+Importantly, two-thirds of the species for which changes in their probabilities of occurrence were detected in this study breed on the Subantarctic islands or on the Antarctic continent. Studies in temperate and mid-latitude regions have shown changes in abundances and/or occurrence of several seabird taxa in the last 50--60 years \citep{peron2010, kuletz2014, sojitra2022}. Predicted distributions of seabirds suggest some Southern Ocean species will change their at-sea distributions southwards \citep{kruger2018}. Our results corroborated the general trend of these predictions. Black-browed \emph{T. melanophris} and Campbell albatrosses often use areas as far north as 20°S \citep{waugh1999, thompson2021}. It is possible that their distributions might be shifting polewards as predicted \citep[e.g.][]{kruger2018} and documented elsewhere \citep{peron2010, sojitra2022}, thus becoming more prevalent in the study area.
+
+The only species decreasing its probability of occurrence in this study was the mottled petrel. Boat-based observations \citep{ainley1979} and recent bio-logging \citep{sagar2019} showed that breeding birds feed preferentially across the Subtropical and Antarctic Polar Fronts, although some birds remain in New Zealand waters. The decrease in its probability of occurrence paralleled decreases in other species that feed in the Southern Ocean, such as the grey petrel. The latter species has New Zealand at the northern edge of its distribution \citep{torres2015}. Although the models did not indicate significant effects for the grey petrel, a slight decrease in its probability of occurrence was detected over the study period, suggesting this species might also be shifting its distribution polewards. All together, these changes in probability of occurrence of several taxa in this study may be the first indications of changes in the mega/macro-scale oceanography in the study region and adjacent areas, including above-average ocean warming regionally and locally \citep{pinkerton2023, sutton2024}.
+
+\hypertarget{limitations-of-the-study}{%
+\subsection{Limitations of the study}\label{limitations-of-the-study}}
+
+Some limitations to the dataset and analyses presented here must be noted. First, the counts of seabirds are not directly comparable with most studies around the globe that use standardised methodologies \citep[e.g.][]{tasker1984}. In this sense, the dataset (i) does not allow for finer spatial and temporal scales to be examined, (ii) may have inflated seabird numbers due to the ship-following behaviour of some species, and (iii) may be slightly biased towards more easily detected species, because the strip-width was not strictly defined. That said, it remains untested how well MaxN can describe seabird numbers at sea. However, it works well for describing assemblages of species for other animal groups \citep[e.g.][]{willis2000, harvey2007}. It is important to note that all the data were collected by a single observer, and only data from the inbound leg of each transect were used in this study. As such, we do not believe any biases present would preclude describing the make-up of the assemblage of seabirds by means of relative numbers. In addition, many of the authors have experienced the Munida transect firsthand (NWD, GL, KIC, ROS, WR), and we are confident that the MaxN counts reflect the distribution patterns of seabirds in the region along both identified predictors: distance from the coast and seasonal dynamics.
+
+Secondly, the limited spatial extent of the study area reduces the options for analyses of highly mobile and wide-ranging seabirds. Data collected from larger areas with parallel or zigzag transects would provide greater opportunities for understanding seabirds' relationships with environmental parameters, including water masses \citep[e.g.][]{woehler2010, evans2021, gall2022}. Nonetheless, other studies have successfully used cross-shelf designs \citep{hunt2014, cushing2024}, albeit with longer transects.
+
+Lastly, seabird distributions may respond to ocean-basin to global scale climate processes. For instance, El Niño-Southern Oscillation (ENSO) phases can cause changes of relative abundance of seabirds \citep{tershy1991} and influence demographic parameters of some species \citep{price2020}. Other studies have detected clear effects of ENSO phases on marine megafauna over relatively short time periods \citep[e.g.][]{sprogis2017}. However, it is likely that the time-series in this study may not be long enough to detect such responses, especially as the data were mostly collected during neutral periods of ENSO (Supplementary Material Fig. S6).
+
+\hypertarget{conclusions}{%
+\section{Conclusions}\label{conclusions}}
+
+Global oceans are warming \citep{cheng2022}, western boundary currents are strengthening \citep{yang2016}, and marine heatwaves are occurring more often \citep{oliver2018}. By identifying seabird assemblages, they can potentially be used as surrogates to help understand predicted environmental changes and associated biological responses. In this study, the assemblages identified were more strongly influenced by season than by the marine environment, likely due to the high number of migratory and dispersive species recorded along the transect.
+
+Given that the environmental niches of seabird species presently appear to be stable during decadal periods \citep{lambert2018, lambert2022}, other metrics may be required in order to detect environmental changes within their at-sea distributions. One such metric is the probability of occurrence over time. Using probability of occurrence we detected changes in two-thirds of the analysed species, in agreement with earlier predictions \citep{kruger2018}. Furthermore, Subantarctic seabirds may be good proxies for detecting early signs of environmental changes in the Southern Ocean based on their at-sea distributions. This study showed that long-term datasets, even at the coarse-scale (\textless100 km), allow changes in occurrence of species to be detected, and may reveal the first evidence for effects of oceanographic changes at larger scales. Therefore, it is essential to continue gathering data along the Munida transect to verify whether probability of occurrence of seabird species continues to change and the possible impacts this might have on the structure of the seasonal species assemblages.
+
+\hypertarget{acknowledgements}{%
+\section*{Acknowledgements}\label{acknowledgements}}
+\addcontentsline{toc}{section}{Acknowledgements}
+
+The authors would like to thank the RV \emph{Polaris II} skipper Bill Dickson and crew for logistic support during all voyages. Thanks to the National Institute of Water and Atmospheric Research (NIWA) and the University of Otago for funding the Munida transect. NWD was supported by a Doctoral scholarship from the University of Otago, Aotearoa/New Zealand; LB is a research fellow from CNPq, Brazil (310145/2022-8). NWD thanks the Department of Marine Science (University of Otago) for supporting a PhD writing retreat, during which most of this manuscript was first drafted. Thanks also to two anonymous reviewers whose comments helped improve our manuscript.
+
+% \hypertarget{references}{%
+% \section*{References}\label{references}}
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{references.bib}
+
+\newpage
+
+\hypertarget{authors-contribution-credit}{%
+\section*{Authors' contribution (CRediT)}\label{authors-contribution-credit}}
+\addcontentsline{toc}{section}{Authors' contribution (CRediT)}
+
+\textbf{Nicholas W. Daudt:} Conceptualization; Methodology; Software; Formal analysis; Data Curation; Visualization; Writing - Original Draft. \textbf{Graeme Loh:} Conceptualization; Investigation; Methodology; Data Curation; Writing - Review \& Editing. \textbf{Kim I. Currie:} Investigation; Resources; Writing - Review \& Editing. \textbf{Matthew R. Schofield:} Conceptualization; Software; Writing - Review \& Editing; Supervision. \textbf{Robert O. Smith:} Writing - Review \& Editing; Supervision. \textbf{Eric J. Woehler:} Writing - Review \& Editing; Supervision. \textbf{Leandro Bugoni:} Writing - Review \& Editing; Supervision. \textbf{William J. Rayment:} Conceptualization; Writing - Review \& Editing; Supervision.
+
+\hypertarget{orcid}{%
+\section*{ORCID}\label{orcid}}
+\addcontentsline{toc}{section}{ORCID}
+
+Nicholas W. Daudt \url{https://orcid.org/0000-0001-8211-8771}
+
+Matthew R. Schofield \url{https://orcid.org/0000-0003-1481-2766}
+
+Robert O. Smith \url{https://orcid.org/0000-0001-5931-3843}
+
+Eric J. Woehler \url{https://orcid.org/0000-0002-1125-0748}
+
+Leandro Bugoni \url{https://orcid.org/0000-0003-0689-7026}
+
+William J. Rayment \url{https://orcid.org/0000-0001-9558-5109}
+
+
+\hypertarget{data-availability-statement}{%
+\section*{Data Availability Statement}\label{data-availability-statement}}
+\addcontentsline{toc}{section}{Data Availability Statement}
+
+The data that support the findings of this study are openly available in \citet{daudt_data_2024}, from Open Science Framework (OSF) at https://osf.io/64vfm/.
+
+\hypertarget{conflict-of-interest-disclosure}{%
+\section*{Conflict of interest disclosure}\label{conflict-of-interest-disclosure}}
+\addcontentsline{toc}{section}{Conflict of interest disclosure}
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\end{document}
