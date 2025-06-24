@@ -107,17 +107,6 @@
       ],
       "Hash": "1e035db628cefb315c571202d70202fe"
     },
-    "RcppGSL": {
-      "Package": "RcppGSL",
-      "Version": "0.3.13",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "Rcpp",
-        "stats"
-      ],
-      "Hash": "e8fc7310d256a7b6c4de8e57ab76c55d"
-    },
     "TMB": {
       "Package": "TMB",
       "Version": "1.9.3",
@@ -145,6 +134,17 @@
         "utils"
       ],
       "Hash": "4f57884290cc75ab22f4af9e9d4ca862"
+    },
+    "alabama": {
+      "Package": "alabama",
+      "Version": "2023.1.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "numDeriv"
+      ],
+      "Hash": "593db7eb170506e6b61ca0c803201924"
     },
     "askpass": {
       "Package": "askpass",
@@ -580,21 +580,22 @@
     },
     "gllvm": {
       "Package": "gllvm",
-      "Version": "1.3.1",
+      "Version": "2.0.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "MASS",
         "Matrix",
         "R",
         "RcppEigen",
         "TMB",
+        "alabama",
         "fishMod",
+        "methods",
         "mgcv",
-        "mvabund",
-        "statmod"
+        "nloptr"
       ],
-      "Hash": "e9721afbb25f9c5584675055dd119181"
+      "Hash": "453f0ad02f71574cb859086b3edf966f"
     },
     "glue": {
       "Package": "glue",
@@ -934,24 +935,6 @@
       ],
       "Hash": "6dfe8bf774944bd5595785e3229d8771"
     },
-    "mvabund": {
-      "Package": "mvabund",
-      "Version": "4.2.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "MASS",
-        "R",
-        "Rcpp",
-        "RcppGSL",
-        "methods",
-        "parallel",
-        "statmod",
-        "stats",
-        "tweedie"
-      ],
-      "Hash": "5ecc462da7ceee1c9d2215ac553a5cb7"
-    },
     "nlme": {
       "Package": "nlme",
       "Version": "3.1-157",
@@ -965,6 +948,23 @@
         "utils"
       ],
       "Hash": "dbca60742be0c9eddc5205e5c7ca1f44"
+    },
+    "nloptr": {
+      "Package": "nloptr",
+      "Version": "2.2.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "dd6975473dd4c9b96e9be93b796b9c1a"
+    },
+    "numDeriv": {
+      "Package": "numDeriv",
+      "Version": "2016.8-1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "df58958f293b166e4ab885ebcad90e02"
     },
     "openssl": {
       "Package": "openssl",
@@ -1408,18 +1408,6 @@
       ],
       "Hash": "2d8eeda5d4b60480add3be08280e55a9"
     },
-    "statmod": {
-      "Package": "statmod",
-      "Version": "1.5.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "graphics",
-        "stats"
-      ],
-      "Hash": "26e158d12052c279bdd4ba858b80fb1f"
-    },
     "stringi": {
       "Package": "stringi",
       "Version": "1.8.3",
@@ -1535,17 +1523,6 @@
         "xfun"
       ],
       "Hash": "c0f007e2eeed7722ce13d42b84a22e07"
-    },
-    "tweedie": {
-      "Package": "tweedie",
-      "Version": "2.3.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "methods"
-      ],
-      "Hash": "517d541554d2e9c392f9a67f42c8b842"
     },
     "units": {
       "Package": "units",
