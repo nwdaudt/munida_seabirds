@@ -459,7 +459,7 @@ all_data_long <-
     species == "wandering_albatross" ~ "Wandering albatross",
     species == "westland_petrel" ~ "Westland petrel",
     species == "australasian_gannet" ~ "Australasian gannet",
-    species == "diving_petrel" ~ "Diving petrel",
+    species == "diving_petrel" ~ "Common diving petrel",
     species == "black_shag" ~ "Black shag",
     species == "black_billed_gull" ~ "Black-billed gull",
     species == "antarctic_prion" ~ "Antarctic prion",

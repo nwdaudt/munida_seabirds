@@ -25,6 +25,7 @@
 library(readxl)
 library(dplyr)
 library(janitor)
+library(ggplot2)
 
 ## Get Munida transect dates ####
 
@@ -35,6 +36,39 @@ munida_dates <-
   dplyr::distinct(date) %>% 
   dplyr::pull() %>% 
   as.Date(date, format = "%Y-%m-%d")
+
+## Salinity vs Distance from TH (plot) ####
+
+ts_data_plot <-
+  readxl::read_xlsx("./data-raw/ts-and-windstress/Munida surface TS data.xlsx") %>% 
+  janitor::clean_names() %>% 
+  # Transform from `POSIXct` to `Date` class
+  dplyr::mutate(date = as.Date(mon_day_yr), 
+                .keep = "unused", .before = "distance_km_from_th") %>% 
+  dplyr::filter(! date == "1900-01-15") %>% 
+  dplyr::filter(date %in% munida_dates) %>% 
+  dplyr::mutate(salinity_psu = ifelse(salinity_psu < 34, yes = NA, no = salinity_psu))
+
+salinity_vs_distance <- 
+  ggplot(data = ts_data_plot) + 
+  geom_point(aes(y = date, x = distance_km_from_th, color = salinity_psu)) +
+  scale_color_distiller(palette = "PuOr", na.value = "grey20", name = "Salinity (PSU)",
+                        breaks = seq(34, 35, 0.2), labels = c(34.0, 34.2, 34.4, 34.6, 34.8, 35.0)) +
+  geom_vline(xintercept = 20, linetype = "solid", linewidth = 1.5, color = "turquoise1") + 
+  ylab("Voyages") + xlab("Distance from Taiaroa Head (km)") + 
+  scale_x_continuous(minor_breaks = seq(0, 60, 5)) +
+  theme(panel.background = element_rect(fill = "grey20"),
+        panel.grid = element_blank(),
+        panel.grid.major.x = element_line(color = "white"),
+        panel.grid.minor.x = element_line(color = "white"),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12, color = "black"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12))
+
+ggsave(salinity_vs_distance,
+       filename = "./results/EDA_salinity-vs-distanceTH.pdf",
+       height = 15, width = 15, unit = "cm")
 
 ## Temperature-Salinity data ####
 
@@ -254,6 +288,17 @@ write.csv(ts_data_summarised,
 #    "NW_sss_mid_seasons", "STW_sss_mid_seasons", "SASW_sss_mid_seasons")
 ## ---------------------------------------------------------------------------- #
 ## ---------------------------------------------------------------------------- #
+
+## SST plot over time ####
+
+sst_over_time <-
+  ggplot(data = ts_data_summarised, aes(x = date, y = sst)) + 
+  geom_point(color = "grey30", size = 1) + 
+  geom_smooth(method = "gam", color = "red") + 
+  geom_smooth(method = "lm", color = "blue") + 
+  xlab("") + ylab("Average SST by 5 km segment") + 
+  theme_bw() + 
+  theme(panel.grid = element_blank())
 
 ## Windstress data ####
 
